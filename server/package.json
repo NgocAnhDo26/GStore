@@ -1,0 +1,32 @@
+{
+    "name": "gstore",
+    "version": "1.0.0",
+    "description": "A website for buying games key license",
+    "main": "app.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "devStart": "nodemon --inspect app.js",
+        "start": "node app.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/NgocAnhDo26/GStore.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/NgocAnhDo26/GStore/issues"
+    },
+    "homepage": "https://github.com/NgocAnhDo26/GStore#readme",
+    "dependencies": {
+        "@prisma/client": "^6.0.0",
+        "dotenv": "^16.4.5",
+        "express": "^4.21.1"
+    },
+    "devDependencies": {
+        "morgan": "^1.10.0",
+        "nodemon": "^3.1.7",
+        "prisma": "^6.0.0"
+    }
+}
