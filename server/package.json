@@ -6,7 +6,9 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "devStart": "nodemon --inspect app.js",
-        "start": "node app.js"
+        "start": "node app.js",
+        "updatePush": "prisma db push",
+        "updatePull": "prisma db pull"
     },
     "repository": {
         "type": "git",
