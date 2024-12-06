@@ -1,6 +1,7 @@
 import React from "react";
 import Sidebar from "../components/user-profile/sidebar";
 import Account from "../components/user-profile/account";
+import PurchaseHistory from "../components/user-profile/purchase-history"
 
 const UserProfile = () => {
   return (
@@ -10,7 +11,7 @@ const UserProfile = () => {
       </div>
 
       <div className="flex-grow">
-        <Account />
+        <PurchaseHistory />
       </div>
     </section>
   );
