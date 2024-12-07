@@ -35,6 +35,11 @@ async function login(req, res) {
         console.log('JWT_SECRET_KEY:', process.env.JWT_SECRET_KEY);  // Check value of JWT_SECRET_KEY
 
         const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
+        await prisma.Token.create({
+          data: {
+              token: token,
+          }
+      });
 
         res.json({
             message: 'Login successful',
@@ -84,5 +89,21 @@ async function register(req, res) {
         res.status(500).json({ message: 'An error occurred, please try again later.' });
     }
 }
+async function logout(req, res) {
+  const token = req.header('Authorization').replace('Bearer ', '');
 
-export { login, register };
+  try {
+      
+      await prisma.token.delete({
+          where: {
+              token: token
+          }
+      });
+
+      res.json({ message: 'Logout successful' });
+  } catch (err) {
+      console.error('Logout error:', err);
+      res.status(500).json({ message: 'An error occurred, please try again later.' });
+  }
+}
+export { login, register,logout };

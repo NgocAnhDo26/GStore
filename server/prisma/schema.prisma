@@ -119,3 +119,10 @@ model publisher {
   name    String    @unique(map: "name") @db.VarChar(50)
   product product[]
 }
+
+model Token {
+  id        Int       @id @default(autoincrement())
+  token     String    @unique(map: "token") @db.VarChar(255)
+  createdAt DateTime? @default(now()) @db.Timestamp(0)
+  updatedAt DateTime? @default(now()) @db.Timestamp(0)
+}
