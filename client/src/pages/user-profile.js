@@ -3,9 +3,11 @@ import Sidebar from "../components/user-profile/sidebar";
 import Account from "../components/user-profile/account";
 import PurchaseHistory from "../components/user-profile/purchase-history";
 import GameCollection from "../components/user-profile/game-collection";
+import MyReviews from "../components/user-profile/my-reviews";
+import Wishlist from "../components/user-profile/wishlist";
 
 const UserProfile = () => {
-  const [activeSection, setActiveSection] = useState("gameCollection");
+  const [activeSection, setActiveSection] = useState("account");
 
   const renderSection = () => {
     switch (activeSection) {
@@ -15,6 +17,10 @@ const UserProfile = () => {
         return <PurchaseHistory />;
       case "gameCollection":
         return <GameCollection />;
+      case "myReviews":
+        return <MyReviews/>
+      case "wishlist":
+        return <Wishlist/>
       default:
         return <Account />;
     }

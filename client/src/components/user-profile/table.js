@@ -27,7 +27,6 @@ const Table = ({ columns, rows }) => {
                                     </a>
                                 )}
                             </th>
-                            
                         ))}
                     </tr>
                 </thead>
@@ -39,7 +38,13 @@ const Table = ({ columns, rows }) => {
                         >
                             {columns.map((col) => (
                                 <td key={col.id} className="px-6 py-4">
-                                    {col.id === "actions" ? (
+                                    {col.type === "image" ? (
+                                        <img
+                                            src={row[col.id]}
+                                            alt={col.label}
+                                            className="h-16 w-16 object-cover rounded-md"
+                                        />
+                                    ) : col.id === "actions" ? (
                                         <a
                                             href={row[col.id] || "#"}
                                             className="font-medium text-blue-600 hover:underline"
