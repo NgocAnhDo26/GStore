@@ -5,6 +5,7 @@ import PurchaseHistory from "../components/user-profile/purchase-history";
 import GameCollection from "../components/user-profile/game-collection";
 import MyReviews from "../components/user-profile/my-reviews";
 import Wishlist from "../components/user-profile/wishlist";
+import Security from "../components/user-profile/security";
 
 const UserProfile = () => {
   const [activeSection, setActiveSection] = useState("account");
@@ -21,6 +22,8 @@ const UserProfile = () => {
         return <MyReviews />;
       case "wishlist":
         return <Wishlist />;
+      case "security":
+        return <Security />;
       default:
         return <Account />;
     }
