@@ -19,19 +19,19 @@ const MyReviews = () => {
     const rows = [
         {
             1: "01/01/2025",
-            2: "0001",
+            2: "LOL",
             3: "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quasi ipsum numquam officia nihil minima hic mollitia saepe quia cupiditate? Doloribus et odit at? Dolorum, ratione modi? Quidem excepturi placeat itaque?",
             actions: "#"
         },
         {
             1: "02/01/2025",
-            2: "0002",
+            2: "DOTA",
             3: "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quasi ipsum numquam officia nihil minima hic mollitia saepe quia cupiditate? Doloribus et odit at? Dolorum, ratione modi? Quidem excepturi placeat itaque?",
             actions: "#"
         },
         {
             1: "03/01/2025",
-            2: "0003",
+            2: "TFT",
             3: "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quasi ipsum numquam officia nihil minima hic mollitia saepe quia cupiditate? Doloribus et odit at? Dolorum, ratione modi? Quidem excepturi placeat itaque?",
             actions: "#"
         }

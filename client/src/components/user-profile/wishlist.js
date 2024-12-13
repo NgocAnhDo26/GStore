@@ -18,20 +18,20 @@ const Wishlist = () => {
 
     const rows = [
         {
-            1: "img/gura-icon.jpg",
-            2: "0001",
+            1: "img/dota.jpg",
+            2: "Dota",
             3: "999.99$",
             actions: "#"
         },
         {
-            1: "img/gura-icon.jpg",
-            2: "0002",
+            1: "img/lol.jpeg",
+            2: "LOL",
             3: "9999.99$",
             actions: "#"
         },
         {
-            1: "img/gura-icon.jpg",
-            2: "0003",
+            1: "img/tft.jpg",
+            2: "TFT",
             3: "99999.99$",
             actions: "#"
         },

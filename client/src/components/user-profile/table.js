@@ -42,7 +42,7 @@ const Table = ({ columns, rows }) => {
                                         <img
                                             src={row[col.id]}
                                             alt={col.label}
-                                            className="h-16 w-16 object-cover rounded-md"
+                                            className="h-48 w-96 object-cover rounded-md"
                                         />
                                     ) : col.id === "actions" ? (
                                         <a
