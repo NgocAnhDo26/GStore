@@ -8,7 +8,7 @@ const PurchaseHistory = () => {
     { id: "2", label: "ID", width: "15%" },
     { id: "3", label: "Game ID", width: "25%" },
     { id: "4", label: "Total", width: "20%", sort: true },
-    { id: "5", label: "Status", width: "20%" },
+    { id: "5", label: "Status", width: "20%", sort: true },
     { id: "actions", label: "Detail" },
   ];
 
