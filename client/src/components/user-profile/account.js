@@ -23,9 +23,9 @@ const Account = () => {
   };
 
   return (
-    <div className="flex flex-col gap-6 rounded-xl  bg-white p-8">
-      <div className="text-2xl font-bold border-b">General</div>
-      <div className="flex flex-col gap-8  pt-4 md:flex-row">
+    <div className="flex flex-col gap-6 rounded-xl bg-white p-8">
+      <div className="border-b text-2xl font-bold">General</div>
+      <div className="flex flex-col gap-8 pt-4 md:flex-row">
         <div className="flex-grow">
           <div>Username</div>
           <div className="text-xs text-gray-500">{accountData.username}</div>
@@ -44,7 +44,7 @@ const Account = () => {
         </div>
       </div>
 
-      <form className="flex flex-col border-t  pt-4">
+      <form className="flex flex-col border-t pt-4">
         <div>Personal</div>
         <input
           type="text"

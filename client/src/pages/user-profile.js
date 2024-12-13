@@ -18,9 +18,9 @@ const UserProfile = () => {
       case "gameCollection":
         return <GameCollection />;
       case "myReviews":
-        return <MyReviews/>
+        return <MyReviews />;
       case "wishlist":
-        return <Wishlist/>
+        return <Wishlist />;
       default:
         return <Account />;
     }
@@ -29,7 +29,10 @@ const UserProfile = () => {
   return (
     <section className="flex justify-start gap-8 bg-custom-dark1 p-8 px-16">
       <div className="hidden h-full md:block">
-        <Sidebar activeSection={activeSection} onSectionChange={setActiveSection} />
+        <Sidebar
+          activeSection={activeSection}
+          onSectionChange={setActiveSection}
+        />
       </div>
 
       <div className="flex-grow">{renderSection()}</div>
