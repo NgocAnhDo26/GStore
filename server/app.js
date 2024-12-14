@@ -1,16 +1,21 @@
 import express from "express";
-import path from "path";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+
 import router from "./src/Routes/index.js";
-import dotenv from "dotenv";
+
+import passportJWT from './src/config/passport-jwt-strategy.js';
 import { PrismaClient } from "@prisma/client";
 
-dotenv.config();
+
 const app = express();
 const __dirname = import.meta.dirname;
 
 // Init middlewares
 app.use(express.urlencoded({ extended: false })); // Parse URL-encoded bodies
 app.use(express.json()); // Parse JSON bodies
+app.use(cors()); // Enable CORS
+app.use(cookieParser()); // Enable cookie parser
 
 // Init routes
 app.use("", router);
