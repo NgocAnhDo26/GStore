@@ -1,6 +1,5 @@
-
 import passport from 'passport';
-import { prisma } from '../config/config.js'; 
+import { prisma } from '../../config/config.js'; 
 const authorize = (isAdminRequired = false) => {
     return async (req, res, next) => {
 

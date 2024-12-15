@@ -1,5 +1,10 @@
-import { authorize } from '../auth/verifyRoute.js';  
-import * as authController from '../auth/authController.js';  
+import { authorize } from '../components/auth/verifyRoute.js';  
+import * as authController from '../components/auth/authController.js';  
+import * as authController from '../components/user/userController/accountController.js';  
+import * as authController from '../components/user/userController/collectionController.js'; 
+import * as authController from '../components/user/userController/reviewController.js';  
+import * as authController from '../components/user/userController/historyController.js'; 
+import * as authController from '../components/user/userController/wishlistController.js'; 
 import express from 'express';
 
 const router = express.Router();
@@ -18,4 +23,5 @@ router.get('/admin', authorize(true), (req, res) => {
 router.get('/profile', authorize(), (req, res) => {
     res.status(200).json({ message: 'Welcome User!', user: req.user });
 });
+
 export default router;
