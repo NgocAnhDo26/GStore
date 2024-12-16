@@ -20,7 +20,7 @@ router.get('/admin', authorize(true), (req, res) => {
 });
 
 
-router.get('/profile/:id/info', authorize(), accountController.getUserInfo); 
+router.get('/profile/:id/info',authorize(), accountController.getUserInfo); 
 router.get('/profile/:id/collection', authorize(), collectionController.getUserGameCollection); 
 router.get('/profile/:id/history', authorize(), historyController.getPurchaseHistory); 
 

@@ -9,7 +9,6 @@ async function getUserInfo(req, res) {
     }
 
     const userInfo = await accountService.fetchAccountByID(Number(id));
-
     if (!userInfo) {
       return res.status(404).json({ error: 'User not found' });
     }

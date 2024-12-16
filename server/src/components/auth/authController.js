@@ -43,7 +43,7 @@ async function login(req, res) {
             }
         });
 
-        resstatus(200).json({
+        res.status(200).json({
             message: 'Login successful',
             token: token,
             user: {
@@ -85,7 +85,7 @@ async function register(req, res) {
             }
         });
 
-        resstatus(200).json({ message: 'Registration successful', user: newUser });
+        res.status(200).json({ message: 'Registration successful', user: newUser });
     } catch (err) {
         console.error('Registration error:', err);
         res.status(500).json({ message: 'An error occurred, please try again later.' });
@@ -102,7 +102,7 @@ async function logout(req, res) {
             }
         });
 
-        resstatus(200).json({ message: 'Logout successful' });
+        res.status(200).json({ message: 'Logout successful' });
     } catch (err) {
         console.error('Logout error:', err);
         res.status(500).json({ message: 'An error occurred, please try again later.' });
@@ -145,7 +145,7 @@ async function changePassword(req, res) {
             data: { password: hashedPassword }
         });
 
-        resstatus(200).json({ message: 'Password changed successfully' });
+        res.status(200).json({ message: 'Password changed successfully' });
     } catch (err) {
         console.error('Change password error:', err);
         if (err.name === 'JsonWebTokenError') {
