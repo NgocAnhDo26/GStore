@@ -1,0 +1,1 @@
+import * as account from '../userService/wishlistService.js'
