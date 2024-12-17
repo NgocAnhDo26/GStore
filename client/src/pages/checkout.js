@@ -2,11 +2,11 @@ import React, { useState } from "react";
 
 const Checkout = () => {
     const summaryData = {
-        subTotal: "$48.00",
-        discount: { value: "$4.00", percentage: "20%" },
-        tax: "$4.00",
-        total: "$52.00",
-      };
+        subTotal: "48.00",
+        discount: { value: "4.00", percentage: "20" },
+        tax: "8.00",
+        total: "52.00",
+    };
 
     const [formData, setFormData] = useState({
         cardHolderName: "",
@@ -30,7 +30,7 @@ const Checkout = () => {
     };
 
     return (
-        <div className="font-[sans-serif] lg:flex lg:items-center lg:justify-center lg:h-screen max-lg:py-4">
+        <div className="lg:flex lg:items-center lg:justify-center lg:h-screen max-lg:py-4">
             <div className="bg-blue-500 p-8 w-full max-w-5xl max-lg:max-w-xl mx-auto rounded-md">
                 <h2 className="text-3xl font-extrabold text-white text-center">Checkout</h2>
 
@@ -49,14 +49,14 @@ const Checkout = () => {
                             <div className="flex items-center">
                                 <input type="radio" className="w-5 h-5 cursor-pointer" id="e-wallet" name="paymentMethod" />
                                 <label htmlFor="paypal" className="ml-4 flex gap-2 cursor-pointer">
-                                    <img src="https://readymadeui.com/images/paypal.webp" className="w-20" alt="e-wallet" />
+                                    <img src="img/momo_icon_square_pinkbg@4x.png" className="w-12" alt="e-wallet" />
                                 </label>
                             </div>
 
                             <div className="flex items-center">
                                 <input type="radio" className="w-5 h-5 cursor-pointer" id="e-bank" name="paymentMethod" />
                                 <label htmlFor="paypal" className="ml-4 flex gap-2 cursor-pointer">
-                                    <img src="https://ebanking.agribank.com.vn/retail/assets/image/logo.svg" className="w-20" alt="e-bank" />
+                                    <img src="img/Icon-OCB.webp" className="w-12" alt="e-bank" />
                                 </label>
                             </div>
                         </div>
@@ -65,6 +65,7 @@ const Checkout = () => {
                             <div className="grid sm:col-span-2 sm:grid-cols-2 gap-4">
                                 <div>
                                     <input
+                                        required
                                         type="text"
                                         name="cardHolderName"
                                         value={formData.cardHolderName}
@@ -75,6 +76,7 @@ const Checkout = () => {
                                 </div>
                                 <div>
                                     <input
+                                        required
                                         type="text"
                                         name="postalCode"
                                         value={formData.postalCode}
@@ -85,6 +87,7 @@ const Checkout = () => {
                                 </div>
                                 <div>
                                     <input
+                                        required
                                         type="text"
                                         name="cardNumber"
                                         value={formData.cardNumber}
@@ -95,6 +98,7 @@ const Checkout = () => {
                                 </div>
                                 <div>
                                     <input
+                                        required
                                         type="text"
                                         name="expiration"
                                         value={formData.expiration}
@@ -105,6 +109,7 @@ const Checkout = () => {
                                 </div>
                                 <div>
                                     <input
+                                        required
                                         type="number"
                                         name="cvv"
                                         value={formData.cvv}
@@ -136,17 +141,17 @@ const Checkout = () => {
                         <h3 className="text-lg font-bold text-gray-800">Summary</h3>
                         <ul className="text-gray-800 mt-6 space-y-3">
                             <li className="flex flex-wrap gap-4 text-sm">
-                                Sub total <span className="ml-auto font-bold">{summaryData.subTotal}</span>
+                                Sub total <span className="ml-auto font-bold">{summaryData.subTotal}đ</span>
                             </li>
                             <li className="flex flex-wrap gap-4 text-sm">
-                                Discount ({summaryData.discount.percentage}){" "}<span className="ml-auto font-bold">$4.00</span>
+                                Discount ({summaryData.discount.percentage}%){" "}<span className="ml-auto font-bold">-{summaryData.discount.value}đ</span>
                             </li>
                             <li className="flex flex-wrap gap-4 text-sm">
-                                Tax <span className="ml-auto font-bold">{summaryData.tax}</span>
+                                Tax <span className="ml-auto font-bold">{summaryData.tax}đ</span>
                             </li>
                             <hr />
                             <li className="flex flex-wrap gap-4 text-base font-bold">
-                                Total <span className="ml-auto">{summaryData.total}</span>
+                                Total <span className="ml-auto">{summaryData.total}đ</span>
                             </li>
                         </ul>
                     </div>
