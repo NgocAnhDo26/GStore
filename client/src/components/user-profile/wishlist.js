@@ -6,7 +6,7 @@ const Wishlist = () => {
   const columns = [
     { id: "1", label: "Image", width: "50%", type: "image" },
     { id: "2", label: "Game Name", width: "20%" },
-    { id: "3", label: "Price", width: "10%" },
+    { id: "3", label: "Price", width: "10%",sort: true },
     { id: "actions", width: "20%", label: "Actions" },
   ];
 
@@ -23,7 +23,7 @@ const Wishlist = () => {
       3: "999.99$",
       actions: [
         { label: "Add to cart", link: "#" },
-        { label: "Delete", link: "#" },
+        { label: "Delete", color: "text-red-600", link: "#" }, 
       ],
     },
     {
@@ -32,7 +32,7 @@ const Wishlist = () => {
       3: "9999.99$",
       actions: [
         { label: "Add to cart", link: "#" },
-        { label: "Delete", link: "#" },
+        { label: "Delete", color: "text-red-600", link: "#" },
       ],
     },
     {
@@ -41,10 +41,10 @@ const Wishlist = () => {
       3: "99999.99$",
       actions: [
         { label: "Add to cart", link: "#" },
-        { label: "Delete", link: "#" },
+        { label: "Delete", color: "text-red-600", link: "#" }, 
       ],
     },
-  ];
+];
 
   return (
     <div className="flex flex-col gap-6 rounded-xl border-solid bg-white p-8">
