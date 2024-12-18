@@ -1,12 +1,13 @@
+import "./src/config/config.js";
+
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
 import router from "./src/Routes/index.js";
 
-import passportJWT from './src/config/passport-jwt-strategy.js';
+import passportJWT from "./src/config/passport-jwt-strategy.js";
 import { PrismaClient } from "@prisma/client";
-
 
 const app = express();
 const __dirname = import.meta.dirname;
@@ -30,14 +31,14 @@ export const prisma = new PrismaClient();
 const PORT = process.env.PORT ?? 1111;
 
 const server = app.listen(PORT, () => {
-    console.log(`GStore starts at port http://localhost:${PORT}`);
+  console.log(`GStore starts at port http://localhost:${PORT}`);
 });
 
 process.on("SIGINT", () => {
-    server.close(() => {
-        console.log("Exit Server Express");
-        prisma.$disconnect;
-    });
+  server.close(() => {
+    console.log("Exit Server Express");
+    prisma.$disconnect;
+  });
 });
 
 // Handing errors
