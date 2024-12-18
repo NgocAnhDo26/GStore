@@ -17,11 +17,6 @@ router.post('/forgot-password', authController.forgotPassword);
 
 router.get('/admin', authorize(true), (req, res) => {
     res.status(200).json({ message: 'Welcome Admin!' });
-});
-
-
-router.get('/profile/:id/info',authorize(), accountController.getUserInfo); 
-router.get('/profile/:id/collection', authorize(), collectionController.getUserGameCollection); 
-router.get('/profile/:id/history', authorize(), historyController.getPurchaseHistory); 
+}); 
 
 export default router;

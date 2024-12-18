@@ -1,5 +1,7 @@
 import * as collectionService from '../userService/collectionService.js'
 
+const router = express.Router();
+
 function getUserGameCollection(req, res) {
     const { id } = req.user.id;
   
@@ -17,5 +19,7 @@ function getUserGameCollection(req, res) {
       return res.status(500).json({ error: 'Internal Server Error' });
     });
   }
+
+router.get('/profile/collection', authorize(), getUserGameCollection); 
   
-  export { getUserGameCollection };
+export default router;

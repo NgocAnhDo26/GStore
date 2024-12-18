@@ -11,6 +11,7 @@ model account {
   id             Int              @id @default(autoincrement())
   name           String           @db.VarChar(70)
   email          String           @unique(map: "email") @db.VarChar(254)
+  phone          String?          @db.VarChar(12)
   password       String           @db.VarChar(72)
   address        String?          @db.VarChar(100)
   birthdate      DateTime?        @db.DateTime(0)

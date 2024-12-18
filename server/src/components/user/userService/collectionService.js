@@ -1,5 +1,6 @@
 import { prisma } from '../../../config/config.js';
 
+
 async function fetchGameCollection(accountId) {
     const collection = await prisma.product.findMany({
       where: {
@@ -22,4 +23,5 @@ async function fetchGameCollection(accountId) {
     return collection;
   }
   
-  export { fetchGameCollection };
+  export { fetchGameCollection, 
+          fetchHistoryWithQuery};

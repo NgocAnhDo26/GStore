@@ -1,5 +1,7 @@
 import * as historyService from '../userService/historyService.js' 
 
+const router = express.Router();
+
 function getPurchaseHistory(req, res) {
     const { id } = req.user.id;
   
@@ -18,4 +20,6 @@ function getPurchaseHistory(req, res) {
       });
   }
   
-  export { getPurchaseHistory };
+  router.get('/profile/history', authorize(), getPurchaseHistory);
+
+  export default router;

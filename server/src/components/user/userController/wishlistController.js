@@ -1,1 +1,1 @@
-import * as account from '../userService/wishlistService.js'
+import * as wishlistService from '../userService/wishlistService.js'

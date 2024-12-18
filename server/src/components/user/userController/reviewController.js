@@ -1,5 +1,7 @@
 import * as reviewService from '../userService/reviewService.js'
 
+const router = express.Router();
+
 function getUserReview(req,res) {
     const { id } = req.user.id;
 
@@ -16,4 +18,7 @@ function getUserReview(req,res) {
             console.error('Error retrieving reviews:', error);
             return res.status(500).json({ error: 'Internal Server Error' });
         })
+};
+export {
+    getUserReview,
 };

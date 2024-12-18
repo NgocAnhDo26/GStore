@@ -6,7 +6,7 @@ import SupportPage from "./pages/support-page";
 
 function App() {
   return (
-    <Checkout />
+    <UserProfile />
   );
 }
 
