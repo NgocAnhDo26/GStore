@@ -1,96 +1,48 @@
-import bcrypt from "bcryptjs";
-import { prisma } from "../config/config.js";
-import jwt from "jsonwebtoken";
-import crypto from "crypto";
-import { sendResetEmail } from "./sendEmail.js";
+import { prisma } from '../config/config.js';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
-async function register(userinfo) {
-  const { name, email, password } = userinfo;
-
-  if (!email || !password || !name) {
-    return { message: "Fields must not be empty", status: 400 };
-  }
-
-  const user = await prisma.account.findUnique({
-    where: { email },
-  });
-
-  if (user) {
-    return { message: "Email already exists", status: 400 };
-  }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const newUser = await prisma.account.create({
-    data: {
-      name,
-      email,
-      password: hashedPassword,
-    },
-  });
-  const payload = {
-    id: newUser.id,
-    email: newUser.email,
-    isAdmin: newUser.is_admin,
-  };
-
-  const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, {
-    expiresIn: "1h",
-  });
-
-  await prisma.Token.create({
-    data: {
-      token: token,
-    },
-  });
-
-  return {
-    message: "Registration successful",
-    token: token,
-    user: newUser,
-    status: 200,
-  };
+async function findUserByEmail(email) {
+    return await prisma.account.findUnique({ where: { email } });
 }
 
-async function login(userinfo) {
-  const { email, password } = userinfo;
+async function createUser({ name, email, password }) {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    return await prisma.account.create({
+        data: {
+            name,
+            email,
+            password: hashedPassword
+        }
+    });
+}
 
-  if (!email || !password) {
-    return { message: "Fields must not be empty", status: 400 };
-  }
+async function comparePasswords(inputPassword, userPassword) {
+    return await bcrypt.compare(inputPassword, userPassword);
+}
 
-  const user = await prisma.account.findUnique({
-    where: { email },
-  });
-
-  if (user) {
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (isMatch) {
-      const payload = {
-        id: user.id,
+function generateToken(user) {
+    const payload = {
+        _id: user.id,
         email: user.email,
         isAdmin: user.is_admin,
-      };
-
-      const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, {
-        expiresIn: "1h",
-      });
-
-      await prisma.Token.create({
-        data: {
-          token: token,
-        },
-      });
-
-      return {
-        message: "Login successful",
-        token: token,
-        user: user,
-        status: 200,
-      };
-    }
-  }
-  return { message: "Incorrect email or password", status: 401 };
+    };
+    return jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
 }
 
-export { login, register };
+async function changeUserPassword(userId, newPassword) {
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    return await prisma.account.update({
+        where: { id: userId },
+        data: { password: hashedPassword }
+    });
+}
+
+
+export {
+    findUserByEmail,
+    createUser,
+    comparePasswords,
+    generateToken,
+    changeUserPassword
+};

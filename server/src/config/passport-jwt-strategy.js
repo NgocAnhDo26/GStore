@@ -1,14 +1,14 @@
-// passport-jwt-strategy.js
 
-import bcrypt from "bcryptjs";
 import { prisma } from "./config.js";
-import jwt from "jsonwebtoken";
 import passport from "passport";
+import { Strategy as JWTStrategy } from "passport-jwt";
 
-import { Strategy as JWTStrategy, ExtractJwt } from "passport-jwt";
 
 let opt = {
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  jwtFromRequest: (req) => {
+  
+    return req.cookies.authToken || null;
+  },
   secretOrKey: process.env.JWT_SECRET_KEY,
 };
 
@@ -30,7 +30,7 @@ passport.use(
       console.log("Error in finding user from jwt", err);
       return done(err, false);
     }
-  }),
+  })
 );
 
 export default passport;

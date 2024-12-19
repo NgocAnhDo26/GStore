@@ -1,141 +1,140 @@
-import crypto from "crypto";
-import { sendResetEmail } from "./sendEmail.js";
-import express from "express";
-import { login, register } from "./authService.js";
+import { findUserByEmail, createUser, comparePasswords, generateToken, changeUserPassword } from './authService.js';
+import jwt from 'jsonwebtoken';
+import express from 'express';
+import crypto from 'crypto';
+import { sendResetEmail } from './sendEmail.js';
 
-const router = express.Router();
 
-router.post("/login", async (req, res) => {
-  login(req.body)
-    .then((result) => {
-      if (Object.keys(result).length < 4) {
-        const { message, status } = result;
-        return res.status(status).json({ message: message });
-      }
-      const { message, token, user, status } = result;
-      return res.status(status).json({ message, token, user });
-    })
-    .catch((err) => {
-      console.error("Registration error:", err);
-      res
-        .status(500)
-        .json({ message: "An error occurred, please try again later." });
-    });
-});
+const authRouter = express.Router();
 
-router.post("/register", async (req, res) => {
-  register(req.body)
-    .then((result) => {
-      if (Object.keys(result).length < 4) {
-        const { message, status } = result;
-        return res.status(status).json({ message: message });
-      }
-      const { message, token, user, status } = result;
-      return res.status(status).json({ message, token, user });
-    })
-    .catch((err) => {
-      console.error("Registration error:", err);
-      res
-        .status(500)
-        .json({ message: "An error occurred, please try again later." });
-    });
-});
+// Login route
+authRouter.post("/login", async (req, res) => {
+    const { email, password } = req.body;
 
-router.post("/logout", async (req, res) => {
-  const token = req.header("Authorization").replace("Bearer ", "");
-
-  try {
-    await prisma.token.delete({
-      where: {
-        token: token,
-      },
-    });
-
-    resstatus(200).json({ message: "Logout successful" });
-  } catch (err) {
-    console.error("Logout error:", err);
-    res
-      .status(500)
-      .json({ message: "An error occurred, please try again later." });
-  }
-});
-
-router.post("/forgot-password", async (req, res) => {
-  const { email } = req.body;
-
-  try {
-    const user = await prisma.account.findUnique({ where: { email } });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    if (!email || !password) {
+        return res.status(400).json({ message: 'Email and password are required.' });
     }
 
-    const newPassword = crypto.randomBytes(8).toString("hex");
+    try {
+        const user = await findUserByEmail(email);
 
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid email' });
+        }
 
-    await prisma.account.update({
-      where: { email },
-      data: { password: hashedPassword },
-    });
+        const isMatch = await comparePasswords(password, user.password);
 
-    await sendResetEmail(email, newPassword);
+        if (!isMatch) {
+            return res.status(401).json({ message: 'Incorrect password' });
+        }
 
-    res
-      .status(200)
-      .json({ message: "New password sent to your email successfully" });
-  } catch (error) {
-    console.error("Error:", error);
-    res
-      .status(500)
-      .json({ message: "An error occurred, please try again later." });
-  }
+        const token = generateToken(user);
+
+        res.cookie('authToken', token, {
+            httpOnly: true,
+            sameSite: 'Strict',
+            maxAge: 3600000,
+        });
+
+        res.status(200).json({
+            message: 'Login successful',
+            user: {
+                id: user.id,
+                email: user.email,
+                name: user.name
+            }
+        });
+    } catch (err) {
+        console.error('Login error:', err);
+        res.status(500).json({ message: 'An error occurred, please try again later.' });
+    }
 });
 
-async function changePassword(req, res) {
-  const { oldPassword, newPassword } = req.body;
-  const token = req.header("Authorization").replace("Bearer ", "");
+// Register route
+authRouter.post("/register", async (req, res) => {
+    const { name, email, password } = req.body;
 
-  if (!oldPassword || !newPassword) {
-    return res
-      .status(400)
-      .json({ message: "Old password and new password are required." });
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-    const userId = decoded._id;
-
-    const user = await prisma.account.findUnique({
-      where: { id: userId },
-    });
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    if (!email || !password) {
+        return res.status(400).json({ message: 'Email and password are required.' });
     }
 
-    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    try {
+        const user = await findUserByEmail(email);
 
-    if (!isMatch) {
-      return res.status(401).json({ message: "Old password is incorrect" });
+        if (user) {
+            return res.status(400).json({ message: 'Email already exists' });
+        }
+
+        const newUser = await createUser({ name, email, password });
+
+        res.status(200).json({ message: 'Registration successful', user: newUser });
+    } catch (err) {
+        console.error('Registration error:', err);
+        res.status(500).json({ message: 'An error occurred, please try again later.' });
+    }
+});
+
+// Logout route
+authRouter.post("/logout", async (req, res) => {
+    res.clearCookie('authToken');
+    res.status(200).json({ message: 'Logout successful' });
+});
+
+// Change password route
+authRouter.post("/change-password", async (req, res) => {
+    const { oldPassword, newPassword } = req.body;
+    const token = req.cookies.authToken;
+
+    if (!oldPassword || !newPassword) {
+        return res.status(400).json({ message: 'Old password and new password are required.' });
     }
 
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+        const userId = decoded._id;
 
-    await prisma.account.update({
-      where: { id: userId },
-      data: { password: hashedPassword },
-    });
+        const user = await findUserByEmail(decoded.email);
 
-    resstatus(200).json({ message: "Password changed successfully" });
-  } catch (err) {
-    console.error("Change password error:", err);
-    if (err.name === "JsonWebTokenError") {
-      return res.status(401).json({ message: "Invalid or expired token" });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const isMatch = await comparePasswords(oldPassword, user.password);
+
+        if (!isMatch) {
+            return res.status(401).json({ message: 'Old password is incorrect' });
+        }
+
+        await changeUserPassword(userId, newPassword);
+
+        res.status(200).json({ message: 'Password changed successfully' });
+    } catch (err) {
+        console.error('Change password error:', err);
+        if (err.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: 'Invalid or expired token' });
+        }
+        res.status(500).json({ message: 'An error occurred, please try again later.' });
     }
-    res
-      .status(500)
-      .json({ message: "An error occurred, please try again later." });
-  }
-}
+});
+authRouter.post("/forgot-password", async (req, res) => {
+    const { email } = req.body;
 
-export default router;
+    try {
+        const user = await findUserByEmail(email);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        const newPassword = crypto.randomBytes(8).toString('hex');
+        await changeUserPassword(user.id, newPassword);
+        await sendResetEmail(email, newPassword);
+
+        res.status(200).json({ message: 'New password sent to your email successfully' });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ message: 'An error occurred, please try again later.' });
+    }
+});
+
+
+
+export default authRouter;
