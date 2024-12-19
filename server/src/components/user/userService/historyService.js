@@ -1,48 +1,66 @@
 import { prisma } from '../../../config/config.js';
 
-// Function to fetch purchase history with filters (query)
 async function fetchHistoryWithQuery(account_id, query) {
-  let filters = { account_id: account_id };
+  let filters = { account_id: account_id, status: 'ok' }; // Default filter to include account and status
   let page = Number(query.page) || 1;
   let limit = Number(query.limit) || 10;
   let offset = (page - 1) * limit;
 
-  // Filter by ID resemblance
+  // Filter by ID (assuming partial match for ID)
   if (query.id) {
-      filters.id = { contains: query.id }; // Assumes resemblance means partial match
+    filters.id = { contains: query.id }; // Adjust based on your database schema
   }
 
   // Filter by minimum and maximum total price
   if (query.min || query.max) {
-      filters.total_price = {
-          gte: query.min ? Number(query.min) : 0,
-          lte: query.max ? Number(query.max) : Number.MAX_SAFE_INTEGER,
-      };
+    filters.total_price = {
+      gte: query.min ? Number(query.min) : 0,
+      lte: query.max ? Number(query.max) : Number.MAX_SAFE_INTEGER,
+    };
   }
 
   // Filter by time range
   if (query.from || query.to) {
-      filters.timestamp = {
-          gte: query.from ? new Date(query.from) : undefined,
-          lte: query.to ? new Date(query.to) : undefined,
-      };
+    filters.created_at = {
+      gte: query.from ? new Date(query.from) : undefined,
+      lte: query.to ? new Date(query.to) : undefined,
+    };
   }
 
-  // Fetch data from database
-  const history = await prisma.purchase_history.findMany({
-      include: {
-          account: true,
-          items: true, // Assumes there is a related `items` table
+  // Fetch orders and related products
+  const history = await prisma.orders.findMany({
+    where: filters,
+    include: {
+      order_product: {
+        include: {
+          product: true, // Assuming the `order_product` table has a relation to the `product` table
+        },
       },
-      where: filters,
+    },
   });
 
   // Pagination logic
-  let paginatedHistory = history.slice(offset, offset + limit);
-  let totalPage = Math.ceil(history.length / limit);
+  const paginatedHistory = history.slice(offset, offset + limit);
+  const totalPage = Math.ceil(history.length / limit);
 
-  return { history: paginatedHistory, totalPage: totalPage, currentPage: page };
+  // Map the data to include order details and product IDs
+  const mappedHistory = paginatedHistory.map((order) => ({
+    order_id: order.id,
+    total_price: order.total_price,
+    created_at: order.created_at,
+    products: order.order_product.map((op) => ({
+      product_id: op.product_id,
+      product_name: op.product.name, // Assuming `product` has a `name` column
+    })),
+  }));
+
+  return {
+    history: mappedHistory,
+    totalPage: totalPage,
+    currentPage: page,
+  };
 }
+
 
 async function fetchPurchaseHistory(accountId) {
   return prisma.orders.findMany({

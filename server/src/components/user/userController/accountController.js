@@ -1,20 +1,19 @@
 import * as accountService from '../userService/accountService.js';
-
+import { authorize } from '../../auth/verifyRoute.js';  
+import express from 'express';
 const router = express.Router();
 
-function getUserInfo(req, res) {
+async function getUserInfo(req, res) {
   try {
-    const { id } = req.user.id;
-
+    const { id } = req.user;
     if (!id) {
       return res.status(400).json({ error: 'User ID is required' });
     }
 
-    const userInfo = accountService.fetchAccountByID(Number(id));
+    const userInfo = await accountService.fetchAccountByID(Number(id));
     if (!userInfo) {
       return res.status(404).json({ error: 'User not found' });
     }
-    
     return res.status(200).json(userInfo);
   } catch (error) {
     console.error('Error fetching user info:', error);
@@ -22,7 +21,7 @@ function getUserInfo(req, res) {
   }
 }
 
-function updateUserInfo(req, res) {
+async function updateUserInfo(req, res) {
   const { id } = req.user.id;
   const { name, birthdate, phone} = req.body;
 
@@ -44,7 +43,7 @@ function updateUserInfo(req, res) {
     });
 }
 
-router.get('/profile/info',authorize(), getUserInfo); 
-router.post('/profile/info',authorize(), updateUserInfo); 
+router.get('/',authorize() ,getUserInfo); 
+router.post('/',authorize(), updateUserInfo); 
 
 export default router;

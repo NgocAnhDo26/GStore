@@ -1,16 +1,17 @@
-import * as historyService from '../userService/historyService.js' 
-
+import * as historyService from '../userService/historyService.js';
+import { authorize } from '../../auth/verifyRoute.js';    
+import express from 'express';
 const router = express.Router();
 
 function getPurchaseHistory(req, res) {
-    const { id } = req.user.id;
+    const { id } = req.user;
   
     if (!id) {
       return res.status(400).json({ error: 'Account ID is required' });
     }
   
     historyService
-      .fetchPurchaseHistory(Number(id))
+      .fetchHistoryWithQuery(Number(id))
       .then((purchaseHistory) => {
         return res.status(200).json(purchaseHistory || []);
       })
@@ -20,6 +21,6 @@ function getPurchaseHistory(req, res) {
       });
   }
   
-  router.get('/profile/history', authorize(), getPurchaseHistory);
+router.get('/', authorize(), getPurchaseHistory);
 
-  export default router;
+export default router;

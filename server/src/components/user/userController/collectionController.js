@@ -1,16 +1,18 @@
-import * as collectionService from '../userService/collectionService.js'
+import * as collectionService from '../userService/collectionService.js';
+import { authorize } from '../../auth/verifyRoute.js';  
+import express from 'express';
 
 const router = express.Router();
 
-function getUserGameCollection(req, res) {
-    const { id } = req.user.id;
+async function getUserGameCollection(req, res) {
+    const { id } = req.user;
   
     if (!id) {
       return res.status(400).json({ error: 'Account ID is required' });
     }
   
     collectionService
-    .fetchGameCollection(Number(id))
+    .fetchGameCollectionWithQuery(Number(id),req.query)
     .then((gameCollection) => {
       return res.status(200).json(gameCollection);
     })
@@ -20,6 +22,6 @@ function getUserGameCollection(req, res) {
     });
   }
 
-router.get('/profile/collection', authorize(), getUserGameCollection); 
+router.get('/', authorize(), getUserGameCollection); 
   
 export default router;
