@@ -5,6 +5,9 @@ import jwt from 'jsonwebtoken';
 async function findUserByEmail(email) {
     return await prisma.account.findUnique({ where: { email } });
 }
+async function findUserByUsername(username) {
+    return await prisma.account.findUnique({ where: { username } });
+}
 
 async function createUser({ username, email, password }) {
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -41,6 +44,7 @@ async function changeUserPassword(userId, newPassword) {
 
 export {
     findUserByEmail,
+    findUserByUsername,
     createUser,
     comparePasswords,
     generateToken,
