@@ -11,9 +11,18 @@ const Header = () => {
   const auth = useAuth();
 
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
 
-  const toggleDropDown = () => {
+  const toggleCategoryDropDown = () => {
     setIsCategoryOpen(!isCategoryOpen);
+  }
+
+  const openProfileDropdown = () => {
+    setIsProfileDropdownOpen(true);
+  }
+
+  const closeProfileDropdown = () => {
+    setIsProfileDropdownOpen(false);
   }
 
   const categoryItems = [
@@ -26,7 +35,7 @@ const Header = () => {
 
   const Categories = () => {
     return (
-      <div class="absolute flex flex-col bg-blue1 py-3 mt-2 rounded-md">
+      <div class="absolute flex flex-col bg-blue1 bg-opacity-90 backdrop-blur-sm py-3 mt-2 rounded-md">
         {categoryItems.map((item) => (
           <Link to={item.href}>
             <p class="hover:bg-btn-blue2 px-5 py-2">
@@ -34,6 +43,19 @@ const Header = () => {
             </p>
           </Link>
         ))}
+      </div>
+    )
+  }
+
+  const ProfileDropDown = () => {
+    return (
+      <div class="absolute flex flex-col bg-blue1 bg-opacity-90 backdrop-blur-sm py-3 rounded-md mt-36 ml-5 text-white">
+        <Link to="/profile" class="hover:bg-btn-blue2 px-5 py-2">
+          Your Profile
+        </Link>
+        <button class="hover:bg-btn-blue2 px-5 py-2 text-left" onClick={closeProfileDropdown && auth.handleLogout}>
+          Logout
+        </button>
       </div>
     )
   }
@@ -56,7 +78,7 @@ const Header = () => {
         </form>
 
         {/* Wishlist Button */}
-        <Link to="/profile/wishlist" class="flex flex-row items-center from-btn-blue2/70 to-btn-blue1/70 rounded-md bg-gradient-to-r shadow-md px-3.5 py-2 max-h-fit h-fit bg-opacity-70 ml-auto hover:scale-105 transition duration-300">
+        <Link to={auth.user ? "/profile/wishlist" : "/login"} class="flex flex-row items-center from-btn-blue2/70 to-btn-blue1/70 rounded-md bg-gradient-to-r shadow-md px-3.5 py-2 max-h-fit h-fit bg-opacity-70 ml-auto hover:scale-105 transition duration-300">
           <IconContext.Provider value={{ color: "white" }}>
             <div class="mr-2">
               <FaRegHeart />
@@ -74,12 +96,16 @@ const Header = () => {
         </Link>
 
         {/* Login/Account button */}
-        <Link to={auth.user ? "/profile" : "/login"} class="border-2 py-1.5 px-3 flex flex-row items-center rounded-md max-h-fit h-fit ml-5 hover:scale-105 hover:bg-white hover:bg-opacity-20 transition duration-300">
-          <IconContext.Provider value={{ color: "white" }}>
-            <FaRegUser />
-          </IconContext.Provider>
-          <p class="text-white ml-3">{auth.user ? auth.user.username : "Login"}</p>
-        </Link>
+        <div onMouseEnter={openProfileDropdown} onMouseLeave={closeProfileDropdown} class="flex flex-row items-center gap-5">
+          <Link to={auth.user ? "/profile" : "/login"} class="border-2 py-1.5 px-3 flex flex-row items-center rounded-md max-h-fit h-fit ml-5 hover:scale-105 hover:bg-white hover:bg-opacity-20 transition duration-300">
+            <IconContext.Provider value={{ color: "white" }}>
+              <FaRegUser />
+            </IconContext.Provider>
+            <p class="text-white ml-3">{auth.user ? auth.user.username : "Login"}</p>
+          </Link>
+
+          {auth.user && isProfileDropdownOpen && <ProfileDropDown />}
+        </div>
       </div>
 
 
@@ -98,7 +124,7 @@ const Header = () => {
         </NavLink>
 
         <div>
-          <button class="flex flex-row items-center gap-2" onClick={toggleDropDown}>
+          <button class="flex flex-row items-center gap-2" onClick={toggleCategoryDropDown}>
             Categories
             <IconContext.Provider value={{ color: "white" }}>
               {isCategoryOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}

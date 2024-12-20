@@ -1,4 +1,4 @@
-import { useContext, createContext, useState } from "react";
+import { useContext, createContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -6,14 +6,26 @@ import Swal from "sweetalert2";
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState();
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+            setUser(JSON.parse(storedUser));
+        }
+    }, []);
+
     const navigate = useNavigate();
 
     const handleLogin = (data) => {
-        axios.post("https://api.p2.lc2s5.foxhub.space/login", data).then((response) => {
+        axios.post("http://localhost:1111/auth/login", data).then((response) => {
+            localStorage.setItem("user", JSON.stringify(response.data.user));
             setUser(response.data.user);
-            navigate("/");
-            return;
+            Swal.fire({
+                icon: "success",
+                title: "Success",
+                text: "Login successful!"
+            }).then(() => navigate("/"));
         }).catch((error) => {
             console.log(error);
             Swal.fire({
@@ -25,6 +37,7 @@ const AuthProvider = ({ children }) => {
     }
 
     const handleLogout = () => {
+        localStorage.removeItem("user");
         setUser(null);
         navigate("/");
     }
