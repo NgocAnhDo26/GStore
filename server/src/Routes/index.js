@@ -1,5 +1,5 @@
-import { authorize } from "../auth/verifyRoute.js";
-import authController from "../auth/authController.js";
+import { authorize } from "../components/auth/verifyRoute.js";
+import authController from "../components/auth/authController.js";
 import express from "express";
 
 const router = express.Router();
