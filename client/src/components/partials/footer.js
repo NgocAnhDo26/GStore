@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
+import { Link } from "react-router-dom";
 
 import { FaFacebook, FaInstagram, FaYoutube } from "react-icons/fa6";
 
@@ -10,27 +11,27 @@ const Footer = () => {
                 <div class="flex flex-col gap-1">
                     <h1 class="font-bold text-lg mb-3">GStore</h1>
 
-                    <a href="">About Us</a>
-                    <a href="">Privacy Policy</a>
-                    <a href="">Terms of Service</a>
+                    <Link to="">About Us</Link>
+                    <Link to="">Privacy Policy</Link>
+                    <Link to="">Terms of Service</Link>
                 </div>
 
                 {/* My account */}
                 <div class="flex flex-col gap-1">
                     <h1 class="font-bold text-lg mb-3">My Account</h1>
 
-                    <a href="">My Account</a>
-                    <a href="">Orders</a>
-                    <a href="">Wishlist</a>
+                    <Link to="">My Account</Link>
+                    <Link to="">Orders</Link>
+                    <Link to="">Wishlist</Link>
                 </div>
 
 
                 {/* Customer Service */}
                 <div class="flex flex-col gap-1">
-                    <h1 class="font-bold text-lg mb-3">GStore</h1>
-
-                    <a href="">Request Support</a>
-                    <a href="">FAQ</a>
+                    <h1 class="font-bold text-lg mb-3">Customer Service</h1>
+        
+                    <Link to="">Request Support</Link>
+                    <Link to="">FAQ</Link>
                 </div>
 
                 {/* Follow us */}
@@ -39,17 +40,17 @@ const Footer = () => {
 
                     <div class="flex items-center gap-3">
                         <FaFacebook />
-                        <a href="">GStore</a>
+                        <Link to="">GStore</Link>
                     </div>
 
                     <div class="flex items-center gap-3">
                         <FaInstagram />
-                        <a href="">GStore</a>
+                        <Link to="">GStore</Link>
                     </div>
 
                     <div class="flex items-center gap-3">
                         <FaYoutube />
-                        <a href="">GStore</a>
+                        <Link to="">GStore</Link>
                     </div>
                 </div>
 

@@ -15,6 +15,7 @@ module.exports = {
         "btn-blue2": "#446ED9",
         "btn-red1": "#F13B3B",
         "btn-red2": "#732424",
+        "form-pink": "#A23951"
       },
     },
   },
