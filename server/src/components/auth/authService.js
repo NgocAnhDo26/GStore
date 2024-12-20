@@ -40,7 +40,9 @@ async function changeUserPassword(userId, newPassword) {
         data: { password: hashedPassword }
     });
 }
-
+async function decodeJwt(token) {
+    return jwt.verify(token, process.env.JWT_SECRET_KEY);
+}
 
 export {
     findUserByEmail,
@@ -48,5 +50,6 @@ export {
     createUser,
     comparePasswords,
     generateToken,
-    changeUserPassword
+    changeUserPassword,
+    decodeJwt
 };

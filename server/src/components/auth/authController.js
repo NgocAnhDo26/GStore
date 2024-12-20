@@ -1,5 +1,4 @@
-import { findUserByEmail, createUser, comparePasswords, generateToken, changeUserPassword,findUserByUsername } from './authService.js';
-import jwt from 'jsonwebtoken';
+import { findUserByEmail, createUser, comparePasswords, generateToken, changeUserPassword,findUserByUsername,decodeJwt } from './authService.js';
 import express from 'express';
 import crypto from 'crypto';
 import { sendResetEmail } from './sendEmail.js';
@@ -90,7 +89,8 @@ authRouter.post("/change-password", async (req, res) => {
     }
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+        const decoded = await decodeJwt(token);
+        console.log('decoded:', decoded);
         const userId = decoded._id;
 
         const user = await findUserByEmail(decoded.email);
