@@ -1,7 +1,4 @@
 import * as accountService from '../userService/accountService.js';
-import { authorize } from '../../auth/verifyRoute.js';  
-import express from 'express';
-const router = express.Router();
 
 async function getUserInfo(req, res) {
   try {
@@ -43,7 +40,7 @@ async function updateUserInfo(req, res) {
     });
 }
 
-router.get('/',authorize() ,getUserInfo); 
-router.post('/',authorize(), updateUserInfo); 
-
-export default router;
+export {
+  getUserInfo,
+  updateUserInfo,
+};

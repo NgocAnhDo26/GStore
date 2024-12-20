@@ -1,7 +1,4 @@
 import * as wishlistService from '../userService/wishlistService.js';
-import express from 'express';
-
-const router = express.Router();
 
 async function getUserWishlist(req, res) {
     const { id } = req.user;
@@ -20,7 +17,7 @@ async function getUserWishlist(req, res) {
     }
 }
 
-// Define the route for fetching the wishlist
-router.get('/', getUserWishlist);
 
-export default router;
+export {
+    getUserWishlist,
+};

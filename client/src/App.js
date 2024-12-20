@@ -8,7 +8,7 @@ import Footer from "./components/partials/footer"
 
 function App() {
   return (
-    <Header />
+    <UserProfile />
   );
 }
 

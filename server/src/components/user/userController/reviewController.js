@@ -1,7 +1,4 @@
-import * as reviewService from '../userService/reviewService.js';
-import { authorize } from '../../auth/verifyRoute.js';   
-import express from 'express';
-const router = express.Router();
+import * as reviewService from '../userService/reviewService.js'; 
 
 async function getUserReview(req,res) {
     const { id } = req.user;
@@ -21,6 +18,6 @@ async function getUserReview(req,res) {
         })
 };
 
-router.get('/', authorize(), getUserReview);
-
-export default router;
+export {
+    getUserReview,
+};

@@ -1,7 +1,4 @@
-import * as historyService from '../userService/historyService.js';
-import { authorize } from '../../auth/verifyRoute.js';    
-import express from 'express';
-const router = express.Router();
+import * as historyService from '../userService/historyService.js';  
 
 function getPurchaseHistory(req, res) {
     const { id } = req.user;
@@ -21,6 +18,7 @@ function getPurchaseHistory(req, res) {
       });
   }
   
-router.get('/', authorize(), getPurchaseHistory);
 
-export default router;
+export {
+  getPurchaseHistory,
+};

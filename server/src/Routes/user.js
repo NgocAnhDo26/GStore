@@ -1,16 +1,22 @@
-import accountController from '../components/user/userController/accountController.js';  
-import collectionController from '../components/user/userController/collectionController.js'; 
-import reviewController from '../components/user/userController/reviewController.js';  
-import historyController from '../components/user/userController/historyController.js'; 
-import wishlistController from '../components/user/userController/wishlistController.js'; 
+import * as accountController from '../components/user/userController/accountController.js';  
+import * as collectionController from '../components/user/userController/collectionController.js'; 
+import * as reviewController from '../components/user/userController/reviewController.js';  
+import * as historyController from '../components/user/userController/historyController.js'; 
+import * as wishlistController from '../components/user/userController/wishlistController.js';
+import { authorize } from "../components/auth/verifyRoute.js"; 
 import express from 'express';
 
 const router = express.Router();
 
-router.use('/profile/info',accountController);
-router.use('/profile/history',historyController);
-router.use('/profile/collection',collectionController);
-router.use('/profile/wishlist',wishlistController);
-router.use('/profile/review',reviewController);
+router.get('/profile/info', authorize(), accountController.getUserInfo); 
+router.post('/profile/info', authorize(), accountController.updateUserInfo); 
+
+router.get('/profile/collection', authorize(), collectionController.getUserGameCollection);
+
+router.get('/profile/history', authorize(), historyController.getPurchaseHistory);
+
+router.get('/profile/review',authorize(),reviewController.getUserReview);
+
+router.get('/profile/wishlist',authorize(),wishlistController.getUserWishlist);
 
 export default router;

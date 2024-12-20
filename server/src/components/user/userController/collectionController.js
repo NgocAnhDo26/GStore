@@ -1,8 +1,4 @@
 import * as collectionService from '../userService/collectionService.js';
-import { authorize } from '../../auth/verifyRoute.js';  
-import express from 'express';
-
-const router = express.Router();
 
 async function getUserGameCollection(req, res) {
     const { id } = req.user;
@@ -21,7 +17,7 @@ async function getUserGameCollection(req, res) {
       return res.status(500).json({ error: 'Internal Server Error' });
     });
   }
-
-router.get('/', authorize(), getUserGameCollection); 
   
-export default router;
+export {
+  getUserGameCollection
+};

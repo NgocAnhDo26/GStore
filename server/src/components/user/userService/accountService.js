@@ -7,7 +7,7 @@ async function fetchAccountByID(accountID) {
         where: { id: accountID },
         select: {
             id: true,
-            name: true,
+            username: true,
             email: true,
             address: true,
             birthdate: true,
@@ -26,7 +26,7 @@ async function updateAccountByID(accountID,name,birthdate,phone) {
             id: accountID
         },
         data: {
-            name: name,
+            username: name,
             birthdate: birthdate,
             phone: phone,
         }
