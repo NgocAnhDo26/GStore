@@ -1,4 +1,4 @@
-import { prisma } from "../config/config.js";
+import { prisma } from "../../config/config.js";
 
 // Function to fetch products with filters (query)
 export async function fetchProductWithQuery(params, query) {
