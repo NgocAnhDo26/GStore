@@ -41,7 +41,7 @@ authRouter.post("/login", async (req, res) => {
             user: {
                 id: user.id,
                 email: user.email,
-                name: user.name
+                username: user.username
             }
         });
     } catch (err) {
@@ -52,7 +52,7 @@ authRouter.post("/login", async (req, res) => {
 
 // Register route
 authRouter.post("/register", async (req, res) => {
-    const { name, email, password } = req.body;
+    const { username, email, password } = req.body;
 
     if (!email || !password) {
         return res.status(400).json({ message: 'Email and password are required.' });
@@ -65,7 +65,7 @@ authRouter.post("/register", async (req, res) => {
             return res.status(400).json({ message: 'Email already exists' });
         }
 
-        const newUser = await createUser({ name, email, password });
+        const newUser = await createUser({ username, email, password });
 
         res.status(200).json({ message: 'Registration successful', user: newUser });
     } catch (err) {
@@ -134,6 +134,19 @@ authRouter.post("/forgot-password", async (req, res) => {
         res.status(500).json({ message: 'An error occurred, please try again later.' });
     }
 });
+authRouter.post("/check-exist-email"), async (req, res) => {
+    const { email } = req.body;
+    try {
+        const user = await findUserByEmail(email);
+        if (user) {
+            return res.status(200).json({ message: 'Email already exists' });
+        }
+        res.status(200).json({ message: 'Email is available' });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ message: 'An error occurred, please try again later.' });
+    }
+}
 
 
 

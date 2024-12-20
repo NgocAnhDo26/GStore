@@ -6,11 +6,11 @@ async function findUserByEmail(email) {
     return await prisma.account.findUnique({ where: { email } });
 }
 
-async function createUser({ name, email, password }) {
+async function createUser({ username, email, password }) {
     const hashedPassword = await bcrypt.hash(password, 10);
     return await prisma.account.create({
         data: {
-            name,
+            username,
             email,
             password: hashedPassword
         }

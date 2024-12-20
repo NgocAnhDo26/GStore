@@ -9,15 +9,16 @@ datasource db {
 
 model account {
   id             Int              @id @default(autoincrement())
-  name           String           @db.VarChar(70)
+  username       String           @db.VarChar(70)
   email          String           @unique(map: "email") @db.VarChar(254)
+  phone          String?          @db.VarChar(12)
   password       String           @db.VarChar(72)
   address        String?          @db.VarChar(100)
   birthdate      DateTime?        @db.DateTime(0)
   sex            String?          @db.VarChar(50)
-  create_time    DateTime?        @default(now()) @db.Timestamp(0)
-  is_lock        Boolean?         @default(false)
-  is_admin       Boolean?         @default(false)
+  create_time    DateTime         @default(now()) @db.Timestamp(0)
+  is_lock        Boolean          @default(false)
+  is_admin       Boolean          @default(false)
   cart           cart[]
   orders         orders[]
   product_review product_review[]
@@ -62,13 +63,12 @@ model order_product {
 }
 
 model orders {
-  id               Int             @id @default(autoincrement())
-  account_id       Int
-  shipping_address String?         @db.VarChar(100)
-  create_time      DateTime?       @default(now()) @db.Timestamp(0)
-  status           String          @db.VarChar(20)
-  order_product    order_product[]
-  account          account         @relation(fields: [account_id], references: [id], onDelete: Cascade, map: "orders_ibfk_1")
+  id            Int             @id @default(autoincrement())
+  account_id    Int
+  create_time   DateTime        @default(now()) @db.Timestamp(0)
+  status        String          @db.VarChar(20)
+  order_product order_product[]
+  account       account         @relation(fields: [account_id], references: [id], onDelete: Cascade, map: "orders_ibfk_1")
 
   @@index([account_id], map: "account_id")
 }
@@ -76,13 +76,13 @@ model orders {
 model product {
   id               Int                @id @default(autoincrement())
   name             String             @unique(map: "name") @db.VarChar(70)
-  description      String?            @db.Text
-  price            Int?               @default(25990000)
-  price_sale       Int?               @default(19990000)
-  in_stock         Int?               @default(1)
-  sales            Int?               @default(1)
-  create_time      DateTime?          @default(now()) @db.Timestamp(0)
-  publisher_id     Int                @db.TinyInt
+  description      String             @db.Text
+  price            Int                @default(1099000)
+  price_sale       Int                @default(1099000)
+  in_stock         Int                @default(100)
+  sales            Int                @default(0)
+  create_time      DateTime           @default(now()) @db.Timestamp(0)
+  publisher_id     Int
   cart             cart[]
   category_product category_product[]
   order_product    order_product[]
@@ -107,6 +107,7 @@ model product_review {
   account_id  Int
   create_time DateTime @default(now()) @db.Timestamp(0)
   content     String   @db.Text
+  rating      Int
   product     product  @relation(fields: [product_id], references: [id], onDelete: Cascade, map: "product_review_ibfk_1")
   account     account  @relation(fields: [account_id], references: [id], onDelete: Cascade, map: "product_review_ibfk_2")
 
@@ -115,7 +116,7 @@ model product_review {
 }
 
 model publisher {
-  id      Int       @id @default(autoincrement()) @db.TinyInt
+  id      Int       @id @default(autoincrement())
   name    String    @unique(map: "name") @db.VarChar(50)
   product product[]
 }
@@ -125,4 +126,12 @@ model Token {
   token     String    @unique(map: "token") @db.VarChar(255)
   createdAt DateTime? @default(now()) @db.Timestamp(0)
   updatedAt DateTime? @default(now()) @db.Timestamp(0)
+}
+
+model wishlist {
+  account_id   Int
+  product_id   Int
+  created_time DateTime @default(now()) @db.Timestamp(0)
+
+  @@id([account_id, product_id])
 }
