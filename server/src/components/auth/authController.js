@@ -1,4 +1,4 @@
-import { findUserByEmail, createUser, comparePasswords, generateToken, changeUserPassword,findUserByUsername,decodeJwt } from './authService.js';
+import { findUserByEmail, createUser, comparePasswords, generateToken, changeUserPassword, findUserByUsername, decodeJwt } from './authService.js';
 import express from 'express';
 import crypto from 'crypto';
 import { sendResetEmail } from './sendEmail.js';
@@ -58,7 +58,13 @@ authRouter.post("/register", async (req, res) => {
     }
 
     try {
+        const userByUsername = await findUserByUsername(username);
+
         const user = await findUserByEmail(email);
+
+        if (userByUsername) {
+            return res.status(400).json({ message: 'Username already exists' });
+        }
 
         if (user) {
             return res.status(400).json({ message: 'Email already exists' });
@@ -134,28 +140,28 @@ authRouter.post("/forgot-password", async (req, res) => {
         res.status(500).json({ message: 'An error occurred, please try again later.' });
     }
 });
-authRouter.post("/check-exist-email", async (req, res) => {
+authRouter.get("/check-exist-email", async (req, res) => {
 
-    const { email } = req.body;
+    const { email } = req.query;
     try {
         const user = await findUserByEmail(email);
         if (user) {
-            return res.status(200).json({ message: 'Email already exists' });
+            return res.status(200).json(true);
         }
-        res.status(200).json({ message: 'Email is available' });
+        res.status(200).json(false);
     } catch (error) {
         console.error('Error:', error);
         res.status(500).json({ message: 'An error occurred, please try again later.' });
     }
 });
-authRouter.post("/check-exist-username", async (req, res) => {
-    const { username } = req.body;
+authRouter.get("/check-exist-username", async (req, res) => {
+    const { username } = req.query;
     try {
         const user = await findUserByUsername(username);
         if (user) {
-            return res.status(200).json({ message: 'Username already exists' });
+            return res.status(200).json(true);
         }
-        res.status(200).json({ message: 'Username is available' });
+        res.status(200).json(false);
     } catch (error) {
         console.error('Error:', error);
         res.status(500).json({ message: 'An error occurred, please try again later.' });

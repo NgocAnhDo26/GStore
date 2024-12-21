@@ -51,6 +51,23 @@ model category_product {
   @@index([product_id], map: "idx_category_product_product")
 }
 
+model feedback {
+  id            Int           @id @default(autoincrement())
+  account_id    Int
+  content       String        @db.Text
+  create_time   DateTime?     @default(now()) @db.Timestamp(0)
+  type_id       Int           @default(1)
+  feedback_type feedback_type @relation(fields: [type_id], references: [id], map: "feedback_ibfk_1")
+
+  @@index([type_id], map: "type_id")
+}
+
+model feedback_type {
+  id       Int        @id @default(autoincrement())
+  name     String     @unique(map: "name") @db.VarChar(50)
+  feedback feedback[]
+}
+
 model order_product {
   order_id   Int
   product_id Int
@@ -102,6 +119,7 @@ model product_image {
   @@id([product_id, url])
 }
 
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model product_review {
   product_id  Int
   account_id  Int
@@ -111,7 +129,7 @@ model product_review {
   product     product  @relation(fields: [product_id], references: [id], onDelete: Cascade, map: "product_review_ibfk_1")
   account     account  @relation(fields: [account_id], references: [id], onDelete: Cascade, map: "product_review_ibfk_2")
 
-  @@id([product_id, account_id, create_time])
+  @@id([product_id, account_id])
   @@index([account_id], map: "account_id")
 }
 
@@ -127,21 +145,4 @@ model wishlist {
   created_time DateTime @default(now()) @db.Timestamp(0)
 
   @@id([account_id, product_id])
-}
-
-model feedback {
-  id            Int           @id @default(autoincrement())
-  account_id    Int
-  content       String        @db.Text
-  create_time   DateTime?     @default(now()) @db.Timestamp(0)
-  type_id       Int           @default(1)
-  feedback_type feedback_type @relation(fields: [type_id], references: [id], map: "feedback_ibfk_1")
-
-  @@index([type_id], map: "type_id")
-}
-
-model feedback_type {
-  id       Int        @id @default(autoincrement())
-  name     String     @unique(map: "name") @db.VarChar(50)
-  feedback feedback[]
 }
