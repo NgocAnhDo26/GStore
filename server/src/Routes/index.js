@@ -1,4 +1,4 @@
-import profileRoute from './profile.js'
+import profileRoute from '../components/profile/profileController.js';  
 import { authorize } from "../components/auth/verifyRoute.js";
 import authController from "../components/auth/authController.js";
 import express from "express";
@@ -11,6 +11,6 @@ router.get("/admin", authorize(true), (req, res) => {
   res.status(200).json({ message: "Welcome Admin!" });
 });
 
-router.use('',profileRoute);
+router.use('/profile',profileRoute);
 
 export default router;
