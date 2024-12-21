@@ -1,4 +1,4 @@
-import { prisma } from '../../../config/config.js';
+import { prisma } from '../../config/config.js';
 
 async function fetchAccountByID(accountID) {
     console.log('Fetching account with ID:', accountID);
