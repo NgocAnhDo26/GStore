@@ -129,7 +129,7 @@ model product_review {
   product     product  @relation(fields: [product_id], references: [id], onDelete: Cascade, map: "product_review_ibfk_1")
   account     account  @relation(fields: [account_id], references: [id], onDelete: Cascade, map: "product_review_ibfk_2")
 
-  @@id([product_id, account_id, create_time])
+  @@id([product_id, account_id])
   @@index([account_id], map: "account_id")
 }
 
