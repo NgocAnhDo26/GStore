@@ -16,15 +16,10 @@ authRouter.post("/login", async (req, res) => {
 
     try {
         const user = await findUserByEmail(email);
-
-        if (!user) {
-            return res.status(401).json({ message: 'Invalid email' });
-        }
-
         const isMatch = await comparePasswords(password, user.password);
 
-        if (!isMatch) {
-            return res.status(401).json({ message: 'Incorrect password' });
+        if (!isMatch || !user) {
+            return res.status(401).json({ message: 'Incorrect email or password' });
         }
 
         const token = generateToken(user);
