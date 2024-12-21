@@ -1,6 +1,6 @@
 import React from "react";
 
-const GameCollection = () => {
+const Products = () => {
     return (
         <div class="flex flex-col items-center justify-center">
             <h1 class="text-3xl font-bold">Game Collection</h1>
@@ -8,3 +8,5 @@ const GameCollection = () => {
         </div>
     );
 }
+
+export default Products;

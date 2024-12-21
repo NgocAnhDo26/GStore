@@ -67,7 +67,7 @@ const Header = () => {
         <Link to="/" class="font-bold text-white text-4xl ml-5 mr-10">GStore</Link>
 
         {/* Search bar */}
-        <form class="flex px-4 py-3 rounded-md border-2 border-white border-opacity-70 hover:border-opacity-100 focus:border-opacity-100 overflow-hidden max-w-lg mx-auto font-[sans-serif] flex-1 transition duration-300">
+        <form class="flex px-4 py-3 rounded-md border-2 border-white border-opacity-70 hover:border-opacity-100 focus:border-opacity-100 overflow-hidden max-w-lg mx-auto font-[sans-serif] flex-1 transition duration-200">
           <input type="" placeholder="Search for games..."
             class="w-full outline-none bg-transparent text-white text-sm" />
           <IconContext.Provider value={{ color: "white" }}>
@@ -78,7 +78,7 @@ const Header = () => {
         </form>
 
         {/* Wishlist Button */}
-        <Link to={auth.user ? "/profile/wishlist" : "/login"} class="flex flex-row items-center from-btn-blue2/70 to-btn-blue1/70 rounded-md bg-gradient-to-r shadow-md px-3.5 py-2 max-h-fit h-fit bg-opacity-70 ml-auto hover:scale-105 transition duration-300">
+        <Link to={auth.user ? "/profile/wishlist" : "/login"} class="flex flex-row items-center from-btn-blue2/70 to-btn-blue1/70 rounded-md bg-gradient-to-r shadow-md px-3.5 py-2 max-h-fit h-fit bg-opacity-70 ml-auto hover:scale-105 transition duration-200">
           <IconContext.Provider value={{ color: "white" }}>
             <div class="mr-2">
               <FaRegHeart />
@@ -88,7 +88,7 @@ const Header = () => {
         </Link>
 
         {/* Cart button */}
-        <Link to="/cart" class="flex flex-row items-center from-btn-red1/60 to-btn-red2/60 rounded-md bg-gradient-to-r shadow-md px-3.5 py-2 max-h-fit h-fit hover:scale-105 transition duration-300">
+        <Link to="/cart" class="flex flex-row items-center from-btn-red1/60 to-btn-red2/60 rounded-md bg-gradient-to-r shadow-md px-3.5 py-2 max-h-fit h-fit hover:scale-105 transition duration-200">
           <IconContext.Provider value={{ color: "white" }}>
             <FiShoppingCart />
           </IconContext.Provider>
@@ -117,7 +117,7 @@ const Header = () => {
           Home
         </NavLink>
 
-        <NavLink to="/collection" className={({ isActive }) =>
+        <NavLink to="/products" className={({ isActive }) =>
           isActive ? "font-bold" : ""
         }>
           Games Collection
