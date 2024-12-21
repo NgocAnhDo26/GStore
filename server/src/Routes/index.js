@@ -1,4 +1,4 @@
-import profileRoute from './user.js'
+import profileRoute from './profile.js'
 import { authorize } from "../components/auth/verifyRoute.js";
 import authController from "../components/auth/authController.js";
 import express from "express";
