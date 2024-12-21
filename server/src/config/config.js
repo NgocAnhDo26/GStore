@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import { PrismaClient } from "@prisma/client";
+import "./passport-jwt-strategy.js"; // Import the passport configuration
 // import { v2 as cloudinary } from "cloudinary";
 
 dotenv.config();

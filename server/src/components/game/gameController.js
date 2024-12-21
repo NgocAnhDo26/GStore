@@ -1,4 +1,4 @@
-import express, { response } from "express";
+import express from "express";
 import * as service from "./gameService.js";
 
 const router = express.Router();

@@ -4,10 +4,14 @@ import * as historyService from "../components/user/userService/historyService.j
 import * as reviewService from "../components/user/userService/reviewService.js";
 import * as wishlistService from "../components/user/userService/wishlistService.js";
 import gameController from "../components/game/gameController.js";
+import cartController from "../components/cart/cartController.js";
+import { authorize } from "../components/auth/verifyRoute.js";
 
 const router = express.Router();
 
 router.use("/product", gameController);
+
+router.use("/cart", authorize(), cartController);
 
 router.get("/history", (req, res) => {
   historyService
