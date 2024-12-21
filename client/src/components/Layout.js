@@ -8,7 +8,7 @@ const Layout = () => {
     const location = useLocation();
 
     return (
-        <div class="flex flex-col bg-custom-dark1 min-h-screen">
+        <div className="flex flex-col bg-custom-dark1 min-h-screen">
             {location.pathname !== '/special-page' && <Header />}
             <Outlet />
             {location.pathname !== '/special-page' && <Footer />}

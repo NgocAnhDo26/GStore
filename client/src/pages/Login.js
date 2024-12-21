@@ -43,36 +43,36 @@ const Login = () => {
     }
 
     return (
-        <div class="flex flex-col first-letter:rounded-md items-center mx-10 my-16 py-10 px-12 bg-gradient-to-t from-blue1 to-form-pink w-[26rem] self-center flex-1 text-white rounded-md">
-            <h1 class=" text-4xl font-bold">GStore</h1>
-            <h1 class=" text-2xl">Start shopping now!</h1>
-            <form onSubmit={onLoginEvent} class="pt-8 w-full" novalidate>
+        <div className="flex flex-col first-letter:rounded-md items-center mx-10 my-16 py-10 px-12 bg-gradient-to-t from-blue1 to-form-pink w-[26rem] self-center flex-1 text-white rounded-md">
+            <h1 className=" text-4xl font-bold">GStore</h1>
+            <h1 className=" text-2xl">Start shopping now!</h1>
+            <form onSubmit={onLoginEvent} className="pt-8 w-full" novalidate>
                 <div className="form_control">
-                    <p class=" py-2">Email</p>
+                    <p className=" py-2">Email</p>
                     <input
                         type="text"
                         id="user-email"
                         name="email"
-                        class="w-full rounded-md p-2 focus:outline-none bg-transparent border-white border-2 border-opacity-70 hover:border-opacity-100 transition duration-300 focus:border-opacity-100"
+                        className="w-full rounded-md p-2 focus:outline-none bg-transparent border-white border-2 border-opacity-70 hover:border-opacity-100 transition duration-300 focus:border-opacity-100"
                         placeholder="example@yahoo.com"
                         onChange={e => { setEmail(e.target.value) }}
                         onBlur={validateEmail}
                     />
-                    {!isEmailCorrect && <p class="text-red-500 mt-1 text-sm">Your email is not valid!</p>}
+                    {!isEmailCorrect && <p className="text-red-500 mt-1 text-sm">Your email is not valid!</p>}
                 </div>
 
                 <div className="form_control">
-                    <p class=" pt-5 pb-2">Password</p>
-                    <div class="flex rounded-md border-white border-2 mb-10 border-opacity-70 hover:border-opacity-100 transition duration-300 focus:border-opacity-100">
+                    <p className=" pt-5 pb-2">Password</p>
+                    <div className="flex rounded-md border-white border-2 mb-10 border-opacity-70 hover:border-opacity-100 transition duration-300 focus:border-opacity-100">
                         <input
                             type={isPasswordVisible ? "text" : "password"}
                             id="password"
                             name="password"
                             placeholder="Enter your password..."
-                            class="w-full p-2 bg-transparent focus:outline-none"
+                            className="w-full p-2 bg-transparent focus:outline-none"
                             onChange={e => { setPassword(e.target.value) }}
                         />
-                        <button class="mr-2" type="button" onClick={togglePassword}>
+                        <button className="mr-2" type="button" onClick={togglePassword}>
                             <IconContext.Provider value={{ color: "white" }}>
                                 {isPasswordVisible ? <FaEye /> : <FaEyeSlash />}
                             </IconContext.Provider>
@@ -83,7 +83,7 @@ const Login = () => {
                 <button type="submit" className="btn-submit w-full bg-white mb-5 rounded-md py-2 font-bold text-blue-950 hover:scale-105 transition duration-300 shadow-md">Login</button>
             </form>
 
-            <p class="mb-5">Don't have an account? <span><Link to="/register" class="font-bold hover:opacity-70">Register</Link></span></p>
+            <p className="mb-5">Don't have an account? <span><Link to="/register" className="font-bold hover:opacity-70">Register</Link></span></p>
         </div>
     );
 }

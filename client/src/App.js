@@ -7,13 +7,12 @@ import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Products from "./pages/Products";
 import UserProfile from "./pages/user-profile";
 import Checkout from "./pages/checkout";
 import SupportPage from "./pages/support-page";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import PrivateRoute from "./routes/route";
-import ProductItem from "./components/products/ProductItem";
-
 
 function App() {
   return (
@@ -27,7 +26,7 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
             </Route>
-            <Route path="/products" element={<ProductItem />} />
+            <Route path="/products" element={<Products />} />
             <Route element={<PrivateRoute />}>
               <Route path="/profile" element={<UserProfile />} />
               <Route path="/checkout" element={<Checkout />} />

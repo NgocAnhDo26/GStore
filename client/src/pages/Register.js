@@ -99,70 +99,70 @@ const Register = () => {
     };
 
     return (
-        <div class="flex flex-col rounded-md items-center mx-10 my-16 py-10 px-12 bg-gradient-to-t from-blue1 to-form-pink w-[26rem] self-center flex-1 text-white">
-            <h1 class=" text-4xl font-bold">GStore</h1>
-            <h1 class=" text-2xl">Create your new account!</h1>
-            <form onSubmit={handleSubmitEvent} class="pt-8 w-full">
+        <div className="flex flex-col rounded-md items-center mx-10 my-16 py-10 px-12 bg-gradient-to-t from-blue1 to-form-pink w-[26rem] self-center flex-1 text-white">
+            <h1 className=" text-4xl font-bold">GStore</h1>
+            <h1 className=" text-2xl">Create your new account!</h1>
+            <form onSubmit={handleSubmitEvent} className="pt-8 w-full">
                 <div className="form_control">
-                    <p class="pt-3 pb-2">Username</p>
+                    <p className="pt-3 pb-2">Username</p>
                     <input
                         type="text"
                         id="username"
                         name="username"
-                        class="w-full rounded-md p-2 focus:outline-none bg-transparent border-white border-2 border-opacity-70 hover:border-opacity-100 transition duration-300 focus:border-opacity-100"
+                        className="w-full rounded-md p-2 focus:outline-none bg-transparent border-white border-2 border-opacity-70 hover:border-opacity-100 transition duration-300 focus:border-opacity-100"
                         placeholder="Enter your username..."
                         onChange={e => { setUsername(e.target.value) }}
                         onBlur={validateUsername}
                     />
-                    {!isUsernameCorrect ? <p class="text-red-500 mt-1 text-sm"> Username only contains alphanumeric & underscores</p> : isUsernameExist && <p class="text-red-500 mt-1 text-sm">This username is already used!</p>}
+                    {!isUsernameCorrect ? <p className="text-red-500 mt-1 text-sm"> Username only contains alphanumeric & underscores</p> : isUsernameExist && <p className="text-red-500 mt-1 text-sm">This username is already used!</p>}
                 </div>
                 <div className="form_control">
-                    <p class="pt-3 pb-2">Email</p>
+                    <p className="pt-3 pb-2">Email</p>
                     <input
                         type="text"
                         id="user-email"
                         name="email"
-                        class="w-full rounded-md p-2 focus:outline-none bg-transparent border-white border-2 border-opacity-70 hover:border-opacity-100 transition duration-300 focus:border-opacity-100"
+                        className="w-full rounded-md p-2 focus:outline-none bg-transparent border-white border-2 border-opacity-70 hover:border-opacity-100 transition duration-300 focus:border-opacity-100"
                         placeholder="example@yahoo.com"
                         onChange={e => { setEmail(e.target.value) }}
                         onBlur={validateEmail}
                     />
-                    {!isEmailCorrect ? <p class="text-red-500 mt-1 text-sm">Your email is invalid!</p> : isEmailExist && <p class="text-red-500 mt-1 text-sm">This email is already used!</p>}
+                    {!isEmailCorrect ? <p className="text-red-500 mt-1 text-sm">Your email is invalid!</p> : isEmailExist && <p className="text-red-500 mt-1 text-sm">This email is already used!</p>}
                 </div>
                 <div className="form_control">
-                    <p class="pt-3 pb-2">Password</p>
+                    <p className="pt-3 pb-2">Password</p>
                     <input
                         type="password"
                         id="password"
                         name="password"
                         placeholder="Enter your password..."
-                        class="w-full rounded-md p-2 focus:outline-none bg-transparent border-white border-2 border-opacity-70 hover:border-opacity-100 transition duration-300 focus:border-opacity-100"
+                        className="w-full rounded-md p-2 focus:outline-none bg-transparent border-white border-2 border-opacity-70 hover:border-opacity-100 transition duration-300 focus:border-opacity-100"
                         aria-describedby="user-password"
                         aria-invalid="false"
                         onChange={e => { setPassword(e.target.value) }}
                         onBlur={validatePassword}
                     />
-                    {!isPasswordCorrect && <p class="text-red-500 mt-1 text-sm">Password must be at least 8 characters long!</p>}
+                    {!isPasswordCorrect && <p className="text-red-500 mt-1 text-sm">Password must be at least 8 characters long!</p>}
                 </div>
                 <div className="form_control">
-                    <p class="pt-3 pb-2">Confirm Password</p>
+                    <p className="pt-3 pb-2">Confirm Password</p>
                     <input
                         type="password"
                         name="password-confirm"
                         placeholder="Enter your password..."
-                        class="w-full rounded-md p-2 focus:outline-none bg-transparent border-white border-2 border-opacity-70 hover:border-opacity-100 transition duration-300 focus:border-opacity-100"
+                        className="w-full rounded-md p-2 focus:outline-none bg-transparent border-white border-2 border-opacity-70 hover:border-opacity-100 transition duration-300 focus:border-opacity-100"
                         aria-describedby="user-password"
                         aria-invalid="false"
                         onChange={e => { setConfirmPassword(e.target.value) }}
                         onBlur={validateConfirmPassword}
                     />
-                    {!isPasswordMatched && <p class="text-red-500 mt-1 text-sm">Passwords do not match!</p>}
+                    {!isPasswordMatched && <p className="text-red-500 mt-1 text-sm">Passwords do not match!</p>}
                 </div>
 
                 <button type="submit" className="btn-submit w-full bg-white mb-5 mt-10 rounded-md py-2 font-bold text-blue-950 hover:scale-105 transition duration-300 shadow-md">Register</button>
             </form>
 
-            <p class="mb-5">Already got an account? <span><Link to="/login" class="font-bold hover:opacity-70">Login</Link></span></p>
+            <p className="mb-5">Already got an account? <span><Link to="/login" className="font-bold hover:opacity-70">Login</Link></span></p>
         </div>
     )
 }
