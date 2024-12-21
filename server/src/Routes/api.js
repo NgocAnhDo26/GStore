@@ -1,8 +1,8 @@
 import express from "express";
-import gameController from "../components/game/gameController.js";
+import profileRoute from '../components/profile/profileController.js';  
 
 const router = express.Router();
 
-router.use("/product", gameController);
+router.use("/profile", profileRoute);
 
 export default router;
