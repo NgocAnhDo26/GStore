@@ -47,11 +47,7 @@ export async function addNewItem(params) {
   const { account_id, product_id } = params;
   const existItem = await prisma.cart.findUnique({
     select: {
-      product: {
-        select: {
-          in_stock: true,
-        },
-      },
+      product_id: true,
     },
     where: {
       account_id_product_id: {
@@ -63,7 +59,15 @@ export async function addNewItem(params) {
   if (existItem) {
     return { message: "Item has been added to cart" };
   }
-  if (!existItem.product.in_stock) {
+  const in_stock = await prisma.product.findUnique({
+    select: {
+      in_stock: true,
+    },
+    where: {
+      id: Number(product_id),
+    },
+  });
+  if (!in_stock.in_stock) {
     return { message: "The game is out of stock" };
   }
   const newItem = await prisma.cart.create({
