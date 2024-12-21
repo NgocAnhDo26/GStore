@@ -286,3 +286,22 @@ export async function fetchFeatureProducts() {
 `;
   return products;
 }
+
+// fetch categories and number of games in each category
+export async function fetchCategories() {
+  const categories = await prisma.category.findMany({
+    select: {
+      name: true,
+      _count: {
+        select: {
+          category_product: true,
+        },
+      },
+    },
+  });
+  const formattedCategories = categories.map((category) => ({
+    name: category.name,
+    count: category._count.category_product,
+  }));
+  return formattedCategories;
+}

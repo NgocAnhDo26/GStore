@@ -47,6 +47,21 @@ router.get("/feature-product", (req, res) => {
     });
 });
 
+// fetch categories and number of games in each category
+router.get("/category", (req, res) => {
+  service
+    .fetchCategories()
+    .then((categories) => {
+      res.status(200).json(categories);
+    })
+    .catch((err) => {
+      console.error("Fetch categories error:", err);
+      res
+        .status(500)
+        .json({ message: "An error occur when fetching categories" });
+    });
+});
+
 router.get("/:product_id", (req, res) => {
   // find products by product id
   service

@@ -2,6 +2,7 @@
 - Url query, filter, and search: get http://localhost:2000/api/product/
 - Feature product: get http://localhost:2000/api/product/feature-product/
 - Bestseller, hot games: get http://localhost:2000/api/product/bestseller/
+- categories and number of games in each category: get http://localhost:2000/api/product/category/
 - Single product (fetch by product_id): get http://localhost:2000/api/product/:product_id/
 2. Shopping cart
 - Fetch all items: get http://localhost:2000/api/cart/:account_id
