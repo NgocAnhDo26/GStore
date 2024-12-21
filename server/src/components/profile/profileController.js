@@ -116,6 +116,7 @@ async function getUserWishlist(req, res) {
 }
 
 router.get('/info',authorize(),getUserInfo);
+router.post('/info',authorize(),updateUserInfo);
 router.get('/collection',authorize(),getUserGameCollection);
 router.get('/history',authorize(),getPurchaseHistory);
 router.get('/review',authorize(),getUserReview);
