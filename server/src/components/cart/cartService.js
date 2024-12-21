@@ -46,6 +46,13 @@ export async function fetchAllItems(account_id) {
 export async function addNewItem(params) {
   const { account_id, product_id } = params;
   const existItem = await prisma.cart.findUnique({
+    select: {
+      product: {
+        select: {
+          in_stock: true,
+        },
+      },
+    },
     where: {
       account_id_product_id: {
         account_id: Number(account_id),
@@ -55,6 +62,9 @@ export async function addNewItem(params) {
   });
   if (existItem) {
     return { message: "Item has been added to cart" };
+  }
+  if (!existItem.product.in_stock) {
+    return { message: "The game is out of stock" };
   }
   const newItem = await prisma.cart.create({
     data: {
@@ -69,6 +79,9 @@ export async function addNewItem(params) {
 export async function removeItem(params) {
   const { account_id, product_id } = params;
   const existItem = await prisma.cart.findUnique({
+    select: {
+      product_id: true,
+    },
     where: {
       account_id_product_id: {
         account_id: Number(account_id),
@@ -93,6 +106,13 @@ export async function removeItem(params) {
 export async function updateItem(item) {
   const { account_id, product_id, quantity } = item;
   const existItem = await prisma.cart.findUnique({
+    select: {
+      product: {
+        select: {
+          in_stock: true,
+        },
+      },
+    },
     where: {
       account_id_product_id: {
         account_id: account_id,
@@ -102,6 +122,9 @@ export async function updateItem(item) {
   });
   if (!existItem) {
     return { message: "Item is not available in cart" };
+  }
+  if (existItem.product.in_stock < quantity) {
+    return { message: "The game is out of stock" };
   }
   const updateItem = await prisma.cart.update({
     select: {
