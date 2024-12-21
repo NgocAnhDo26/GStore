@@ -1,5 +1,5 @@
 1. Product listing, search, filter
-- Url query, filter, and search: get http://localhost:2000/api/product/
+- if no query, fetch all; else fetch with Url query, filter, and search: get http://localhost:2000/api/product/
 - Feature product: get http://localhost:2000/api/product/feature-product/
 - Bestseller, hot games: get http://localhost:2000/api/product/bestseller/
 - categories and number of games in each category: get http://localhost:2000/api/product/category/
