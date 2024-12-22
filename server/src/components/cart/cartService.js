@@ -1,4 +1,5 @@
 import { prisma } from "../../config/config.js";
+import { getImage } from "../util/util.js";
 
 export async function fetchAllItems(account_id) {
   const items = await prisma.cart.findMany({
@@ -13,7 +14,7 @@ export async function fetchAllItems(account_id) {
           },
           product_image: {
             select: {
-              url: true,
+              public_id: true,
             },
             where: {
               is_profile_img: true,
@@ -34,7 +35,7 @@ export async function fetchAllItems(account_id) {
   const formatItems = items.map((item) => ({
     name: item.product.name,
     publisher_name: item.product.publisher.name,
-    profile_img: item.product.product_image[0]?.url,
+    profile_img: getImage(item.product.product_image[0]?.public_id),
     price: item.product.price,
     price_sale: item.product.price_sale,
     total_save: item.product.price - item.product.price_sale,

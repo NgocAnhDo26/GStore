@@ -1,10 +1,8 @@
 import "./src/config/config.js";
-
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import passport from 'passport';
-
+import passport from "passport";
 import router from "./src/Routes/index.js";
 
 const app = express();

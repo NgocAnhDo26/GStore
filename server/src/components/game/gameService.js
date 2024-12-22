@@ -1,7 +1,8 @@
 import { prisma } from "../../config/config.js";
+import { getImage } from "../util/util.js";
 
 // Function to fetch products with filters (query)
-export async function fetchProductWithQuery(params, query) {
+export async function fetchProductWithQuery(query) {
   let filters = {
     AND: [],
   };
@@ -67,7 +68,7 @@ export async function fetchProductWithQuery(params, query) {
       price: true,
       price_sale: true,
       product_image: {
-        select: { url: true },
+        select: { public_id: true },
         where: { is_profile_img: true },
         take: 1,
       },
@@ -108,7 +109,7 @@ export async function fetchProductWithQuery(params, query) {
       name: product.name,
       price: product.price,
       price_sale: product.price_sale,
-      profile_img: product.product_image[0]?.url || null,
+      profile_img: getImage(product.product_image[0]?.public_id),
       averageRating,
       categories: categoryNames,
     };
@@ -162,7 +163,7 @@ export async function fetchProductByID(productID) {
   // Fetch the product details
   const product = await prisma.product.findUnique({
     where: {
-      id: Number(productID),
+      id: productID,
     },
     select: {
       id: true,
@@ -187,7 +188,7 @@ export async function fetchProductByID(productID) {
       },
       product_image: {
         select: {
-          url: true,
+          public_id: true,
         },
         orderBy: { is_profile_img: "desc" },
       },
@@ -227,8 +228,10 @@ export async function fetchProductByID(productID) {
       create_time: product.create_time,
       publisher: product.publisher.name,
       categories: product.category_product.map((item) => item.category.name),
-      profile_img: product.product_image[0].url,
-      other_img: product.product_image.slice(1).map((item) => item.url),
+      profile_img: getImage(product.product_image[0].public_id),
+      other_img: product.product_image
+        .slice(1)
+        .map((item) => getImage(item.public_id)),
       product_review: product.product_review.map((item) => ({
         username: item.account.username,
         create_time: item.create_time,
@@ -251,7 +254,7 @@ export async function fetchBestSellersProducts() {
       price_sale: true,
       product_image: {
         select: {
-          url: true,
+          public_id: true,
         },
         where: {
           is_profile_img: true,
@@ -269,18 +272,18 @@ export async function fetchBestSellersProducts() {
     name: product.name,
     price: product.price,
     price_sale: product.price_sale,
-    profile_img: product.product_image[0]?.url || null,
+    profile_img: getImage(product.product_image[0]?.public_id),
   }));
 }
 
 export async function fetchFeatureProducts() {
   const products = await prisma.$queryRaw`
-  SELECT p.id, p.name, p.price, p.price_sale, pi.url as profile_img
+  SELECT p.id, p.name, p.price, p.price_sale, pi.public_id as profile_img
   FROM product p
   JOIN product_image pi on p.id = pi.product_id
   LEFT JOIN product_review pr ON p.id = pr.product_id
   WHERE pi.is_profile_img = true
-  GROUP BY p.id, pi.url
+  GROUP BY p.id, pi.public_id
   ORDER BY COALESCE(AVG(pr.rating), 0) DESC
   LIMIT 12;
 `;

@@ -3,13 +3,13 @@ import { authorize } from "../components/auth/verifyRoute.js";
 import authController from "../components/auth/authController.js";
 import express from "express";
 import api from "./api.js";
-import adminController from "../components/admin/adminController.js";
+import adminRoute from "./admin.js";
 
 const router = express.Router();
 
 router.use("/auth", authController);
 
-router.get("/admin", authorize(true), adminController);
+router.use("/admin", authorize(true), adminRoute);
 
 router.use("/profile", profileRoute);
 
