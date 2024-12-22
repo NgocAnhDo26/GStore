@@ -1,5 +1,4 @@
-import { findUserByEmail, createUser, comparePasswords, generateToken, changeUserPassword,findUserByUsername } from './authService.js';
-import jwt from 'jsonwebtoken';
+import { findUserByEmail, createUser, comparePasswords, generateToken, changeUserPassword, findUserByUsername, decodeJwt } from './authService.js';
 import express from 'express';
 import crypto from 'crypto';
 import { sendResetEmail } from './sendEmail.js';
@@ -17,15 +16,10 @@ authRouter.post("/login", async (req, res) => {
 
     try {
         const user = await findUserByEmail(email);
-
-        if (!user) {
-            return res.status(401).json({ message: 'Invalid email' });
-        }
-
         const isMatch = await comparePasswords(password, user.password);
 
-        if (!isMatch) {
-            return res.status(401).json({ message: 'Incorrect password' });
+        if (!isMatch || !user) {
+            return res.status(401).json({ message: 'Incorrect email or password' });
         }
 
         const token = generateToken(user);
@@ -59,7 +53,13 @@ authRouter.post("/register", async (req, res) => {
     }
 
     try {
+        const userByUsername = await findUserByUsername(username);
+
         const user = await findUserByEmail(email);
+
+        if (userByUsername) {
+            return res.status(400).json({ message: 'Username already exists' });
+        }
 
         if (user) {
             return res.status(400).json({ message: 'Email already exists' });
@@ -90,7 +90,8 @@ authRouter.post("/profile/security", async (req, res) => {
     }
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+        const decoded = await decodeJwt(token);
+        console.log('decoded:', decoded);
         const userId = decoded._id;
 
         const user = await findUserByEmail(decoded.email);
@@ -134,28 +135,28 @@ authRouter.post("/forgot-password", async (req, res) => {
         res.status(500).json({ message: 'An error occurred, please try again later.' });
     }
 });
-authRouter.post("/check-exist-email", async (req, res) => {
+authRouter.get("/check-exist-email", async (req, res) => {
 
-    const { email } = req.body;
+    const { email } = req.query;
     try {
         const user = await findUserByEmail(email);
         if (user) {
-            return res.status(200).json({ message: 'Email already exists' });
+            return res.status(200).json(true);
         }
-        res.status(200).json({ message: 'Email is available' });
+        res.status(200).json(false);
     } catch (error) {
         console.error('Error:', error);
         res.status(500).json({ message: 'An error occurred, please try again later.' });
     }
 });
-authRouter.post("/check-exist-username", async (req, res) => {
-    const { username } = req.body;
+authRouter.get("/check-exist-username", async (req, res) => {
+    const { username } = req.query;
     try {
         const user = await findUserByUsername(username);
         if (user) {
-            return res.status(200).json({ message: 'Username already exists' });
+            return res.status(200).json(true);
         }
-        res.status(200).json({ message: 'Username is available' });
+        res.status(200).json(false);
     } catch (error) {
         console.error('Error:', error);
         res.status(500).json({ message: 'An error occurred, please try again later.' });

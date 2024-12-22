@@ -4,14 +4,17 @@ import express from 'express';
 
 const router = express.Router();
 
+
 async function getUserInfo(req, res) {
     try {
-      const { id } = req.user;
+      const token = req.cookies.authToken;
+      const decoded = await profileService.decodeJwt(token);
+      const id = decoded._id;
       if (!id) {
         return res.status(400).json({ error: 'User ID is required' });
       }
   
-      const userInfo = await accountService.fetchAccountByID(Number(id));
+      const userInfo = await profileService.fetchAccountByID(Number(id));
       if (!userInfo) {
         return res.status(404).json({ error: 'User not found' });
       }
@@ -23,35 +26,59 @@ async function getUserInfo(req, res) {
 }
   
 async function updateUserInfo(req, res) {
-    const { id } = req.user.id;
-    const { name, birthdate, phone} = req.body;
-  
-    if (!id) {
+  const token = req.cookies.authToken;
+  const decoded = await profileService.decodeJwt(token);
+  const id = decoded._id;
+
+  if (!id) {
       return res.status(400).json({ error: 'Account ID is required' });
-    }
-  
-    accountService
-      .updateAccountByID(Number(id),name,birthdate,phone)
-      .then((updatedUserInfo) => {
-        if (!updatedUserInfo) {
+  }
+
+  const { name, birthdate, phone } = req.body;
+
+  const updateData = {};
+  if (name) updateData.name = name;
+  if (birthdate) {
+      const dateObj = new Date(birthdate);
+      if (!isNaN(dateObj)) {
+          updateData.birthdate = dateObj.toISOString().split('T')[0]; // Format to YYYY-MM-DD
+      } else {
+          return res.status(400).json({ error: 'Invalid birthdate format' });
+      }
+  }
+  if (phone) updateData.phone = phone;
+
+  try {
+      if (Object.keys(updateData).length === 0) {
+          return res.status(400).json({ error: 'No valid fields provided for update' });
+      }
+
+      const updatedUserInfo = await profileService.updateAccountByID(Number(id), updateData);
+
+      // Check if the update was successful
+      if (!updatedUserInfo) {
           return res.status(404).json({ error: 'User not found' });
-        }
-        return res.status(200).json(updateUserInfo);
-      })
-      .catch((error) => {
-        console.error('Error updating user info:', error);
-        return res.status(500).json({ error: 'Internal Server Error' });
-      });
+      }
+
+      // Respond with the updated user info
+      return res.status(200).json(updatedUserInfo);
+  } catch (error) {
+      console.error('Error updating user info:', error);
+      return res.status(500).json({ error: 'Internal Server Error' });
+  }
 }
 
+
 async function getUserGameCollection(req, res) {
-    const { id } = req.user;
+    const token = req.cookies.authToken;
+    const decoded = await profileService.decodeJwt(token);
+    const id = decoded._id;
   
     if (!id) {
       return res.status(400).json({ error: 'Account ID is required' });
     }
   
-    collectionService
+    profileService
     .fetchGameCollectionWithQuery(Number(id),req.query)
     .then((gameCollection) => {
       return res.status(200).json(gameCollection);
@@ -63,13 +90,15 @@ async function getUserGameCollection(req, res) {
 }
 
 async function getPurchaseHistory(req, res) {
-    const { id } = req.user;
+    const token = req.cookies.authToken;
+    const decoded = await profileService.decodeJwt(token);
+    const id = decoded._id;
   
     if (!id) {
       return res.status(400).json({ error: 'Account ID is required' });
     }
   
-    historyService
+    profileService
       .fetchHistoryWithQuery(Number(id))
       .then((purchaseHistory) => {
         return res.status(200).json(purchaseHistory || []);
@@ -81,13 +110,15 @@ async function getPurchaseHistory(req, res) {
 }
 
 async function getUserReview(req,res) {
-    const { id } = req.user;
+    const token = req.cookies.authToken;
+    const decoded = await profileService.decodeJwt(token);
+    const id = decoded._id;
 
     if (!id) {
         return res.status(400).json({ error: 'Account ID is required' });
     }
 
-    reviewService
+    profileService
         .fetchUserReviewWithQuery(Number(id),req.query)
         .then((reviews) => {
             return res.status(200).json(reviews);
@@ -99,7 +130,9 @@ async function getUserReview(req,res) {
 };
 
 async function getUserWishlist(req, res) {
-    const { id } = req.user;
+    const token = req.cookies.authToken;
+    const decoded = await profileService.decodeJwt(token);
+    const id = decoded._id;
 
     if (!id) {
         return res.status(400).json({ error: 'Account ID is required' });
@@ -107,7 +140,7 @@ async function getUserWishlist(req, res) {
 
     try {
         // Call the wishlist service to fetch the wishlist with query filters
-        const result = await wishlistService.fetchWishlistWithQuery(Number(id), req.query);
+        const result = await profileService.fetchWishlistWithQuery(Number(id), req.query);
         return res.status(200).json(result);  // Send back the result as JSON response
     } catch (error) {
         console.error('Error fetching wishlist:', error);

@@ -1,4 +1,5 @@
 import { prisma } from '../../config/config.js';
+import jwt from 'jsonwebtoken';
 
 async function fetchAccountByID(accountID) {
     console.log('Fetching account with ID:', accountID);
@@ -19,21 +20,31 @@ async function fetchAccountByID(accountID) {
     return account;
 };
 
-async function updateAccountByID(accountID,name,birthdate,phone) {
-    console.log('Updating account with ID:', accountID);
-    const updatedUser = await prisma.account.update({
-        where: {
-            id: accountID
-        },
-        data: {
-            username: name,
-            birthdate: birthdate,
-            phone: phone,
-        }
-    });
-    console.log('Account found:', updatedUser);
-    return updatedUser;
+async function updateAccountByID(accountID, updateFields) {
+  console.log('Updating account with ID:', accountID);
+
+  // Filter out undefined fields dynamically
+  const dataToUpdate = {};
+  if (updateFields.username) dataToUpdate.username = { set: updateFields.username };
+  if (updateFields.birthdate) dataToUpdate.birthdate = new Date(updateFields.birthdate);
+  if (updateFields.phone) dataToUpdate.phone = updateFields.phone;
+
+  try {
+      const updatedUser = await prisma.account.update({
+          where: {
+              id: accountID,
+          },
+          data: dataToUpdate,
+      });
+
+      console.log('Account updated:', updatedUser);
+      return updatedUser;
+  } catch (error) {
+      console.error('Error updating account:', error);
+      throw new Error('Failed to update account.');
+  }
 }
+
 
 async function fetchGameCollectionWithQuery(account_id, query) {
     try {
@@ -337,6 +348,10 @@ async function fetchWishlistWithQuery(account_id, query) {
     }
 }
 
+async function decodeJwt(token) {
+  return jwt.verify(token, process.env.JWT_SECRET_KEY);
+}
+
 export {
     fetchAccountByID,
     updateAccountByID,
@@ -346,4 +361,5 @@ export {
     fetchPurchaseHistory,
     fetchUserReviewWithQuery,
     fetchWishlistWithQuery,
+    decodeJwt,
 };
