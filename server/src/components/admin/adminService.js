@@ -53,7 +53,7 @@ export async function addNewProduct(product, images) {
     select: { id: true },
   });
 
-  // upload images to cloudinary
+  // Upload images to cloudinary
   await Promise.all(
     images.map(async (image, idx) => {
       const result = await new Promise((resolve, reject) => {
@@ -94,7 +94,7 @@ export async function addNewProduct(product, images) {
   return { message: "Add new game successfully" };
 }
 
-// edit product
+// Edit product
 export async function editProduct(product, images) {
   const {
     id,
@@ -105,6 +105,7 @@ export async function editProduct(product, images) {
     in_stock,
     publisher_name,
     categories,
+    old_images, // Send by public_id
   } = product;
   if (!id) {
     return { message: "Missing product id" };
@@ -112,19 +113,20 @@ export async function editProduct(product, images) {
   const existGame = await prisma.product.findUnique({
     where: { id: Number(id) },
     select: {
-      id: true,
       product_image: { select: { public_id: true } },
     },
   });
   if (!existGame) {
     return { message: "Game is not available" };
   }
+
   const publisher = await prisma.publisher.upsert({
     where: { name: publisher_name },
     update: {},
     create: { name: publisher_name },
     select: { id: true },
   });
+
   await prisma.product.update({
     where: { id: Number(id) },
     data: {
@@ -136,23 +138,37 @@ export async function editProduct(product, images) {
       publisher: { connect: { id: publisher.id } },
     },
   });
-  if (images && images.length) {
-    // delete old images from cloudinary
+
+  // Delete image
+  if (old_images.length) {
     await Promise.all(
-      existGame.product_image.map((img) => {
+      old_images.map((public_id) => {
+        // Remove old image from db
+        prisma.product_image.delete({
+          where: {
+            public_id: public_id,
+          },
+        });
+        // Delete old image from cloudinary
         return new Promise((resolve, reject) => {
-          cloudinary.uploader.destroy(img.public_id, (error, result) => {
+          cloudinary.uploader.destroy(public_id, (error, result) => {
             if (error) reject(error);
             resolve(result);
           });
         });
       }),
     );
-    // remove old images from db
-    await prisma.product_image.deleteMany({
-      where: { product_id: existGame.id },
+  }
+
+  if (images.length) {
+    // Check if this product has profile image
+    const isExistProfileImg = await prisma.product_image.findUnique({
+      where: {
+        product_id: id,
+        is_profile_img: true,
+      },
     });
-    // upload new images
+    // Upload new images
     await Promise.all(
       images.map(async (image, idx) => {
         const result = await new Promise((resolve, reject) => {
@@ -165,39 +181,55 @@ export async function editProduct(product, images) {
         });
         await prisma.product_image.create({
           data: {
-            product_id: existGame.id,
+            product_id: id,
             public_id: result.public_id,
-            is_profile_img: idx === 0,
+            is_profile_img: isExistProfileImg ? false : idx === 0,
           },
         });
       }),
     );
   }
-  if (categories && categories.length) {
-    await prisma.category_product.deleteMany({
-      where: { product_id: existGame.id },
-    });
+  
+  if (categories.length) {
     await Promise.all(
       categories.map(async (cat) => {
+        // Add new category
         const c = await prisma.category.upsert({
           where: { name: cat },
           update: {},
           create: { name: cat },
           select: { id: true },
         });
-        await prisma.category_product.create({
-          data: {
-            category_id: c.id,
-            product_id: existGame.id,
-          },
-        });
+        // Remove old product category
+        await prisma.category_product
+          .delete({
+            where: {
+              category_id_product_id: {
+                category_id: c.id,
+                product_id: id,
+              },
+            },
+          })
+          .catch(async (err) => {
+            if (err.code === "P2015") {
+              // Prisma code P2015: "A related record could not be found. {details}"
+              // delete a not exist product category
+              // add new product category here
+              await prisma.category_product.create({
+                data: {
+                  category_id: c.id,
+                  product_id: id,
+                },
+              });
+            }
+          });
       }),
     );
   }
   return { message: "Product updated successfully" };
 }
 
-// remove product
+// Remove product
 export async function removeProduct(product_id) {
   const existGame = await prisma.product.findUnique({
     select: {
@@ -214,7 +246,7 @@ export async function removeProduct(product_id) {
   await prisma.category_product.deleteMany({
     where: { product_id: product_id },
   });
-  // delete images from cloudinary
+  // Delete images from cloudinary
   await Promise.all(
     existGame.product_image.map((image) => {
       new Promise((resolve, reject) => {
@@ -233,3 +265,5 @@ export async function removeProduct(product_id) {
   });
   return { message: "Game removed successfully" };
 }
+
+export async function viewGameSales() {}

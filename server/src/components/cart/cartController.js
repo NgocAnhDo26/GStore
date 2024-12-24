@@ -3,13 +3,11 @@ import * as service from "./cartService.js";
 
 const router = express.Router();
 
-// get cart items base on account_id
+// Get cart items base on account_id
 router.get("/:account_id", (req, res) => {
   service
     .fetchAllItems(Number(req.params.account_id))
-    .then((items) => {
-      return res.status(200).json(items);
-    })
+    .then((items) => res.status(200).json(items))
     .catch((err) => {
       console.error("Fetch cart items:", err);
       return res
@@ -18,7 +16,7 @@ router.get("/:account_id", (req, res) => {
     });
 });
 
-// add new item to cart
+// Add new item to cart
 router.post("/:account_id/item/:product_id", (req, res) => {
   service
     .addNewItem(req.params)
@@ -36,7 +34,7 @@ router.post("/:account_id/item/:product_id", (req, res) => {
     });
 });
 
-// remove item from cart
+// Remove item from cart
 router.delete("/:account_id/item/:product_id", (req, res) => {
   service
     .removeItem(req.params)
@@ -54,7 +52,7 @@ router.delete("/:account_id/item/:product_id", (req, res) => {
     });
 });
 
-// update item quantity
+// Update item quantity
 router.put("/", (req, res) => {
   service
     .updateItem(req.body)

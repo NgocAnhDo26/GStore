@@ -3,9 +3,7 @@ import passport from "passport";
 import { Strategy as JWTStrategy } from "passport-jwt";
 
 let opt = {
-  jwtFromRequest: (req) => {
-    return req.cookies.authToken || null;
-  },
+  jwtFromRequest: (req) => req.cookies.authToken || null,
   secretOrKey: process.env.JWT_SECRET_KEY,
 };
 

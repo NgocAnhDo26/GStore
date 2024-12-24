@@ -3,13 +3,11 @@ import * as service from "./gameService.js";
 
 const router = express.Router();
 
-// route for query product
+// Route for query product
 router.get("/", (req, res) => {
   service
     .fetchProductWithQuery(req.query)
-    .then((products) => {
-      return res.status(200).json(products);
-    })
+    .then((products) => res.status(200).json(products))
     .catch((err) => {
       console.error("Fetch games by query:", err);
       return res.status(500).json({
@@ -18,13 +16,11 @@ router.get("/", (req, res) => {
     });
 });
 
-// best sellers, hot games
+// Best sellers, hot games
 router.get("/bestseller", (req, res) => {
   service
     .fetchBestSellersProducts()
-    .then((bestSellersProducts) => {
-      return res.status(200).json(bestSellersProducts);
-    })
+    .then((bestSellersProducts) => res.status(200).json(bestSellersProducts))
     .catch((err) => {
       console.error("Fetch best sellers games error:", err);
       return res.status(500).json({
@@ -36,9 +32,7 @@ router.get("/bestseller", (req, res) => {
 router.get("/feature-product", (req, res) => {
   service
     .fetchFeatureProducts()
-    .then((featureProducts) => {
-      return res.status(200).json(featureProducts);
-    })
+    .then((featureProducts) => res.status(200).json(featureProducts))
     .catch((err) => {
       console.error("Fetch feature games error:", err);
       return res
@@ -47,7 +41,7 @@ router.get("/feature-product", (req, res) => {
     });
 });
 
-// fetch categories and number of games in each category
+// Fetch categories and number of games in each category
 router.get("/category", (req, res) => {
   service
     .fetchCategories()
@@ -62,10 +56,25 @@ router.get("/category", (req, res) => {
     });
 });
 
-router.get("/:product_id", (req, res) => {
-  // find products by product id
+router.get("/list-productID", (req, res) => {
+  // Find products by list of product id
   service
-    .fetchProductByID(req.params.product_id)
+    .fetchProductByListID(req.body)
+    .then((singleProduct) => {
+      res.status(200).json(singleProduct);
+    })
+    .catch((err) => {
+      console.error("Fetch games by list of id error:", err);
+      res
+        .status(500)
+        .json({ message: "An error occur when fetching game by list of id" });
+    });
+});
+
+router.get("/:product_id", (req, res) => {
+  // Find products by product id
+  service
+    .fetchProductByID(Number(req.params.product_id))
     .then((singleProduct) => {
       res.status(200).json(singleProduct);
     })

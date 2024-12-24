@@ -82,13 +82,11 @@ async function fetchPurchaseHistory(accountId) {
         },
       },
     },
-  }).then((orders) => {
+  }).then((orders) => 
     
     // Calculate the total price for each order
-    return orders.map((order) => {
-      const totalPrice = order.order_products.reduce((sum, orderProduct) => {
-        return sum + (orderProduct.product.price || 0);
-      }, 0);
+     orders.map((order) => {
+      const totalPrice = order.order_products.reduce((sum, orderProduct) => sum + (orderProduct.product.price || 0), 0);
 
       return {
         id: order.id,
@@ -96,8 +94,8 @@ async function fetchPurchaseHistory(accountId) {
         total_price: totalPrice,
         products: order.order_products.map((orderProduct) => orderProduct.product),
       };
-    });
-  });
+    })
+  );
 }
 
 export { fetchPurchaseHistory,

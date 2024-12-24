@@ -9,9 +9,7 @@ function getPurchaseHistory(req, res) {
   
     historyService
       .fetchHistoryWithQuery(Number(id))
-      .then((purchaseHistory) => {
-        return res.status(200).json(purchaseHistory || []);
-      })
+      .then((purchaseHistory) => res.status(200).json(purchaseHistory || []))
       .catch((error) => {
         console.error('Error fetching purchase history:', error);
         return res.status(500).json({ error: 'Internal Server Error' });

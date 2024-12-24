@@ -19,7 +19,6 @@ export async function fetchAllItems(account_id) {
             where: {
               is_profile_img: true,
             },
-            take: 1,
           },
           price: true,
           price_sale: true,

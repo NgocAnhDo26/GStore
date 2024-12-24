@@ -4,6 +4,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import passport from "passport";
 import router from "./src/Routes/index.js";
+import { prisma } from "./src/config/config.js";
 
 const app = express();
 

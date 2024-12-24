@@ -8,7 +8,7 @@ import { upload } from "../../config/config.js";
 
 const router = express.Router();
 
-// fetch all current games
+// Fetch all current games
 router.get("/", (req, res) => {
   fetchProductWithQuery(req.query)
     .then((products) => res.status(200).json(products))
@@ -18,7 +18,7 @@ router.get("/", (req, res) => {
     });
 });
 
-// add new game
+// Add new game
 router.post("/", upload.array("images"), (req, res) => {
   service
     .addNewProduct(req.body, req.files)
@@ -29,7 +29,7 @@ router.post("/", upload.array("images"), (req, res) => {
     });
 });
 
-// update game
+// Update game
 router.put("/", upload.array("images"), (req, res) => {
   service
     .editProduct(req.body, req.files)
@@ -40,7 +40,12 @@ router.put("/", upload.array("images"), (req, res) => {
     });
 });
 
-// remove game
+// View game sales analysis
+router.get("/sale", (req, res)=>{
+  
+})
+
+// Remove game
 router.delete("/:product_id", (req, res) => {
   const { product_id } = req.params;
   service
@@ -54,7 +59,7 @@ router.delete("/:product_id", (req, res) => {
     });
 });
 
-// display detail product
+// Display detail product
 router.get("/:product_id", (req, res) => {
   const { product_id } = req.params;
   fetchProductByID(Number(product_id))

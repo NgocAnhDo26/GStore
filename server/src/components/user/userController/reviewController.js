@@ -9,9 +9,7 @@ async function getUserReview(req,res) {
 
     reviewService
         .fetchUserReviewWithQuery(Number(id),req.query)
-        .then((reviews) => {
-            return res.status(200).json(reviews);
-        })
+        .then((reviews) => res.status(200).json(reviews))
         .catch((error) => {
             console.error('Error retrieving reviews:', error);
             return res.status(500).json({ error: 'Internal Server Error' });

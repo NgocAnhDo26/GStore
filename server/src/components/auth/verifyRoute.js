@@ -1,6 +1,5 @@
 import passport from "passport";
-const authorize = (isAdminRequired = false) => {
-  return async (req, res, next) => {
+const authorize = (isAdminRequired = false) => async (req, res, next) => {
     passport.authenticate("jwt", { session: false }, async (err, user) => {
       console.log("User:", user);
       if (err || !user) {
@@ -14,6 +13,5 @@ const authorize = (isAdminRequired = false) => {
       next();
     })(req, res, next);
   };
-};
 
 export { authorize };

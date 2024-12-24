@@ -9,9 +9,7 @@ async function getUserGameCollection(req, res) {
   
     collectionService
     .fetchGameCollectionWithQuery(Number(id),req.query)
-    .then((gameCollection) => {
-      return res.status(200).json(gameCollection);
-    })
+    .then((gameCollection) => res.status(200).json(gameCollection))
     .catch((error) => {
       console.error('Error retrieving game collection:', error);
       return res.status(500).json({ error: 'Internal Server Error' });

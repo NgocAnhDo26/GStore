@@ -70,7 +70,6 @@ export async function fetchProductWithQuery(query) {
       product_image: {
         select: { public_id: true },
         where: { is_profile_img: true },
-        take: 1,
       },
       category_product: {
         select: {
@@ -87,7 +86,7 @@ export async function fetchProductWithQuery(query) {
   });
 
   if (!products.length) {
-    return []; // empty products
+    return []; // Empty products
   }
 
   // Process products to include average rating and category names
@@ -97,7 +96,7 @@ export async function fetchProductWithQuery(query) {
       0,
     );
     const averageRating = product.product_review.length
-      ? Math.round((totalRating / product.product_review.length) * 10) / 10 // round to 1 decimal place
+      ? Math.round((totalRating / product.product_review.length) * 10) / 10 // Round to 1 decimal place
       : null;
 
     const categoryNames = product.category_product.map(
@@ -149,7 +148,7 @@ export async function fetchProductWithQuery(query) {
 
   // Return paginated products
   if (!filteredProducts.length) {
-    return []; // empty products
+    return []; // Empty products
   }
   return {
     products: filteredProducts.slice(offset, offset + limit),
@@ -190,7 +189,9 @@ export async function fetchProductByID(productID) {
         select: {
           public_id: true,
         },
-        orderBy: { is_profile_img: "desc" },
+        where: {
+          is_profile_img: true,
+        },
       },
       product_review: {
         select: {
@@ -242,7 +243,46 @@ export async function fetchProductByID(productID) {
     formattedProducts.averageRating = averageRating;
     return formattedProducts;
   }
-  return {}; // empty product
+  return {}; // Empty product
+}
+
+export async function fetchProductByListID(listID) {
+  const { listProductID } = listID;
+  const products = await prisma.product.findMany({
+    select: {
+      id: true,
+      name: true,
+      publisher: {
+        select: {
+          name: true,
+        },
+      },
+      product_image: {
+        select: {
+          public_id: true,
+        },
+        where: {
+          is_profile_img: true,
+        },
+      },
+      price: true,
+      price_sale: true,
+    },
+    where: {
+      id: {
+        in: listProductID,
+      },
+    },
+  });
+  const formattedProducts = products.map((product) => ({
+    id: product.id,
+    name: product.name,
+    price: product.price,
+    price_sale: product.price_sale,
+    publisher: product.publisher.name,
+    profile_img: getImage(product.product_image[0].public_id),
+  }));
+  return formattedProducts;
 }
 
 export async function fetchBestSellersProducts() {
@@ -259,11 +299,10 @@ export async function fetchBestSellersProducts() {
         where: {
           is_profile_img: true,
         },
-        take: 1,
       },
     },
     orderBy: {
-      sales: "desc", // the most sale products
+      sales: "desc", // The most sale products
     },
     take: 12,
   });
@@ -290,7 +329,7 @@ export async function fetchFeatureProducts() {
   return products;
 }
 
-// fetch categories and number of games in each category
+// Fetch categories and number of games in each category
 export async function fetchCategories() {
   const categories = await prisma.category.findMany({
     select: {
