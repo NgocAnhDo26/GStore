@@ -6,12 +6,12 @@ const adminRouter = express.Router();
 adminRouter.post("/", async (req, res) => {
     const { email, content } = req.body;
 
-    if (! email || !content) {
-        return res.status(400).json({ content: ' email and content are required.' });
+    if (!email || !content) {
+        return res.status(400).json({ content: 'Email and content are required.' });
     }
 
     try {
-        await replyFeedback( email, content);
+        await replyFeedback(email, content);
 
         res.status(200).json({ message: 'Feedback sent successfully' });
     } catch (err) {
