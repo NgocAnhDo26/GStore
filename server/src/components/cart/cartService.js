@@ -1,11 +1,12 @@
 import { prisma } from "../../config/config.js";
 import { getImage } from "../util/util.js";
 
-export async function fetchAllItems(account_id) {
-  const items = await prisma.cart.findMany({
+export async function fetchAllGames(accountID) {
+  const games = await prisma.cart.findMany({
     select: {
       product: {
         select: {
+          id: true,
           name: true,
           publisher: {
             select: {
@@ -28,88 +29,134 @@ export async function fetchAllItems(account_id) {
     },
 
     where: {
-      account_id: account_id,
+      account_id: accountID,
     },
   });
-  const formatItems = items.map((item) => ({
-    name: item.product.name,
-    publisher_name: item.product.publisher.name,
-    profile_img: getImage(item.product.product_image[0]?.public_id),
-    price: item.product.price,
-    price_sale: item.product.price_sale,
-    total_save: item.product.price - item.product.price_sale,
-    quantity: item.quantity,
+
+  if (!games.length) {
+    throw new Error(`Cart is empty`);
+  }
+
+  const formatResult = games.map((game) => ({
+    name: game.product.name,
+    publisher_name: game.product.publisher.name,
+    profile_img: getImage(game.product.product_image[0]?.public_id),
+    price: game.product.price,
+    price_sale: game.product.price_sale,
+    total_save: game.product.price - game.product.price_sale,
+    quantity: game.quantity,
   }));
-  return formatItems;
+  return formatResult;
 }
 
-export async function addNewItem(params) {
-  const { account_id, product_id } = params;
-  const existItem = await prisma.cart.findUnique({
+// Can add list new game or 1 game
+export async function addNewGame(accountID, productList) {
+  const { products } = productList; // products: [{productID, quantity}]
+  const result = { products: [] };
+
+  if (!products.length) {
+    throw new Error("No product add to cart ");
+  }
+
+  await Promise.all(
+    products.map(async (product) => {
+      const productInfo = await prisma.product.findUnique({
+        where: { id: product.id },
+        select: { in_stock: true },
+      });
+
+      if (!productInfo) {
+        throw new Error(`Product ${product.id} not found`);
+      }
+
+      if (product.quantity > productInfo.in_stock) {
+        throw new Error(
+          `Product ${product.id}: requested quantity ${product.quantity} exceeds in-stock amount`,
+        );
+      }
+
+      const newGame = await prisma.cart.upsert({
+        where: {
+          account_id_product_id: {
+            account_id: accountID,
+            product_id: product.id,
+          },
+        },
+        create: {
+          account_id: accountID,
+          product_id: product.id,
+          quantity: product.quantity,
+        },
+        update: {
+          quantity: product.quantity,
+        },
+        select: {
+          product: {
+            select: {
+              id: true,
+              name: true,
+              publisher: { select: { name: true } },
+              product_image: {
+                select: { public_id: true },
+                where: { is_profile_img: true },
+              },
+              price: true,
+              price_sale: true,
+            },
+          },
+          quantity: true,
+        },
+      });
+
+      const formatResult = {
+        name: newGame.product.name,
+        publisher_name: newGame.product.publisher.name,
+        profile_img: getImage(newGame.product.product_image[0]?.public_id),
+        price: newGame.product.price,
+        price_sale: newGame.product.price_sale,
+        total_save: newGame.product.price - newGame.product.price_sale,
+        quantity: newGame.quantity,
+      };
+
+      result.products.push(formatResult);
+    }),
+  );
+
+  return result;
+}
+
+export async function removeGame(accountID, params) {
+  const { productID } = params;
+  const existedGame = await prisma.cart.findUnique({
     select: {
       product_id: true,
     },
     where: {
       account_id_product_id: {
-        account_id: Number(account_id),
-        product_id: Number(product_id),
+        account_id: accountID,
+        product_id: Number(productID),
       },
     },
   });
-  if (existItem) {
-    return { message: "Item has been added to cart" };
-  }
-  const in_stock = await prisma.product.findUnique({
-    select: {
-      in_stock: true,
-    },
-    where: {
-      id: Number(product_id),
-    },
-  });
-  if (!in_stock.in_stock) {
-    return { message: "The game is out of stock" };
-  }
-  const newItem = await prisma.cart.create({
-    data: {
-      account_id: Number(account_id),
-      product_id: Number(product_id),
-      quantity: 1,
-    },
-  });
-  return newItem;
-}
 
-export async function removeItem(params) {
-  const { account_id, product_id } = params;
-  const existItem = await prisma.cart.findUnique({
-    select: {
-      product_id: true,
-    },
+  if (!existedGame) {
+    throw new Error(`Product ${productID} is not available in cart`);
+  }
+
+  const deletedGame = await prisma.cart.delete({
     where: {
       account_id_product_id: {
-        account_id: Number(account_id),
-        product_id: Number(product_id),
+        account_id: accountID,
+        product_id: Number(productID),
       },
     },
   });
-  if (!existItem) {
-    return { message: "Item is not available in cart" };
-  }
-  const deleteItem = await prisma.cart.delete({
-    where: {
-      account_id_product_id: {
-        account_id: Number(account_id),
-        product_id: Number(product_id),
-      },
-    },
-  });
-  return deleteItem;
+  return deletedGame;
 }
 
-export async function updateItem(item) {
-  const { account_id, product_id, quantity } = item;
-  const existItem = await prisma.cart.findUnique({
+export async function updateGame(accountID, product) {
+  const { productID, quantity } = product;
+  const existedGame = await prisma.cart.findUnique({
     select: {
       product: {
         select: {
@@ -119,18 +166,21 @@ export async function updateItem(item) {
     },
     where: {
       account_id_product_id: {
-        account_id: account_id,
-        product_id: product_id,
+        account_id: accountID,
+        product_id: productID,
       },
     },
   });
-  if (!existItem) {
-    return { message: "Item is not available in cart" };
+
+  if (!existedGame) {
+    throw new Error(`Game ${productID} is not available in cart`);
   }
-  if (existItem.product.in_stock < quantity) {
-    return { message: "The game is out of stock" };
+
+  if (existedGame.product.in_stock < quantity) {
+    throw new Error(`Game ${productID} is out of stock`);
   }
-  const updateItem = await prisma.cart.update({
+
+  const updatedGame = await prisma.cart.update({
     select: {
       quantity: true,
       product: {
@@ -145,17 +195,18 @@ export async function updateItem(item) {
     },
     where: {
       account_id_product_id: {
-        account_id: account_id,
-        product_id: product_id,
+        account_id: accountID,
+        product_id: productID,
       },
     },
   });
-  const price = updateItem.product.price * item.quantity,
-    price_sale = updateItem.product.price_sale * item.quantity;
-  const formatItem = {
+
+  const price = updatedGame.product.price * product.quantity,
+    price_sale = updatedGame.product.price_sale * product.quantity;
+  const formatResult = {
     price: price,
     price_sale: price_sale,
     total_save: price - price_sale,
   };
-  return formatItem;
+  return formatResult;
 }

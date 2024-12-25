@@ -10,9 +10,7 @@ router.get("/", (req, res) => {
     .then((products) => res.status(200).json(products))
     .catch((err) => {
       console.error("Fetch games by query:", err);
-      return res.status(500).json({
-        message: "An error occur when fetching games by query",
-      });
+      return res.status(500).json({ message: err.message });
     });
 });
 
@@ -23,9 +21,7 @@ router.get("/bestseller", (req, res) => {
     .then((bestSellersProducts) => res.status(200).json(bestSellersProducts))
     .catch((err) => {
       console.error("Fetch best sellers games error:", err);
-      return res.status(500).json({
-        message: "An error occur when fetching best sellers games",
-      });
+      return res.status(500).json({ message: err.message });
     });
 });
 
@@ -35,9 +31,7 @@ router.get("/feature-product", (req, res) => {
     .then((featureProducts) => res.status(200).json(featureProducts))
     .catch((err) => {
       console.error("Fetch feature games error:", err);
-      return res
-        .status(500)
-        .json({ message: "An error occur when fetching feature games" });
+      return res.status(500).json({ message: err.message });
     });
 });
 
@@ -50,9 +44,7 @@ router.get("/category", (req, res) => {
     })
     .catch((err) => {
       console.error("Fetch categories error:", err);
-      res
-        .status(500)
-        .json({ message: "An error occur when fetching categories" });
+      return res.status(500).json({ message: err.message });
     });
 });
 
@@ -65,24 +57,20 @@ router.get("/list-productID", (req, res) => {
     })
     .catch((err) => {
       console.error("Fetch games by list of id error:", err);
-      res
-        .status(500)
-        .json({ message: "An error occur when fetching game by list of id" });
+      return res.status(500).json({ message: err.message });
     });
 });
 
-router.get("/:product_id", (req, res) => {
+router.get("/:productID", (req, res) => {
   // Find products by product id
   service
-    .fetchProductByID(Number(req.params.product_id))
+    .fetchProductByID(Number(req.params.productID))
     .then((singleProduct) => {
       res.status(200).json(singleProduct);
     })
     .catch((err) => {
       console.error("Fetch game by id error:", err);
-      res
-        .status(500)
-        .json({ message: "An error occur when fetching game by id" });
+      return res.status(500).json({ message: err.message });
     });
 });
 

@@ -3,70 +3,51 @@ import * as service from "./cartService.js";
 
 const router = express.Router();
 
-// Get cart items base on account_id
-router.get("/:account_id", (req, res) => {
+// Fetch games in cart by accountID
+router.get("/", (req, res) => {
+  const { id } = req.user;
   service
-    .fetchAllItems(Number(req.params.account_id))
-    .then((items) => res.status(200).json(items))
+    .fetchAllGames(id)
+    .then((games) => res.status(200).json(games))
     .catch((err) => {
-      console.error("Fetch cart items:", err);
-      return res
-        .status(500)
-        .json({ message: "An error occur when fetching cart items" });
+      console.error("Fetch cart games:", err);
+      return res.status(500).json({ message: err.message });
     });
 });
 
-// Add new item to cart
-router.post("/:account_id/item/:product_id", (req, res) => {
+// Add new game to cart
+router.post("/", (req, res) => {
+  const { id } = req.user;
   service
-    .addNewItem(req.params)
-    .then((item) => {
-      if (item.message) {
-        return res.status(400).json(item);
-      }
-      return res.status(200).json(item);
-    })
+    .addNewGame(id, req.body)
+    .then((game) => res.status(200).json(game))
     .catch((err) => {
-      console.error("add new item:", err);
-      return res
-        .status(500)
-        .json({ message: "An error occur when adding new item" });
+      console.error("Add new game:", err);
+      return res.status(500).json({ message: err.message });
     });
 });
 
-// Remove item from cart
-router.delete("/:account_id/item/:product_id", (req, res) => {
+// Remove game from cart
+router.delete("/:productID", (req, res) => {
+  const { id } = req.user;
   service
-    .removeItem(req.params)
-    .then((item) => {
-      if (item.message) {
-        return res.status(400).json(item);
-      }
-      return res.status(200).json(item);
-    })
+    .removeGame(Number(id), req.params)
+    .then((game) => res.status(200).json(game))
     .catch((err) => {
-      console.error("remove item:", err);
-      return res
-        .status(500)
-        .json({ message: "An error occur when removing cart item" });
+      console.error("Remove game:", err);
+      return res.status(500).json({ message: err.message });
     });
 });
 
-// Update item quantity
+// Update game quantity
 router.put("/", (req, res) => {
+  const { id } = req.user;
   service
-    .updateItem(req.body)
-    .then((item) => {
-      if (item.message) {
-        return res.status(400).json(item);
-      }
-      return res.status(200).json(item);
-    })
+    .updateGame(id, req.body)
+    .then((game) => res.status(200).json(game))
     .catch((err) => {
-      console.error("update item:", err);
-      return res
-        .status(500)
-        .json({ message: "An error occur when updating cart item" });
+      console.error("Update game:", err);
+      return res.status(500).json({ message: err.message });
     });
 });
 export default router;

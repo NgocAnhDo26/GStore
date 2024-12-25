@@ -189,8 +189,8 @@ export async function fetchProductByID(productID) {
         select: {
           public_id: true,
         },
-        where: {
-          is_profile_img: true,
+        orderBy: {
+          is_profile_img: "desc",
         },
       },
       product_review: {
