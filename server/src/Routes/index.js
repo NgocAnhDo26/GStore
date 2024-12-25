@@ -1,5 +1,3 @@
-import profileRoute from "./user.js";
-import { authorize } from "../components/auth/verifyRoute.js";
 import authController from "../components/auth/authController.js"; 
 import express from "express";
 import api from "./api.js";
@@ -9,9 +7,7 @@ const router = express.Router();
 
 router.use("/auth", authController);
 
-router.use("/admin", authorize(true), adminRoute);
-
-router.use("/profile", profileRoute);
+router.use("/admin", adminRoute);
 
 router.use("/api", api);
 

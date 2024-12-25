@@ -1,5 +1,5 @@
 
-import { checkoutService ,decodeJwt} from './purchaseService.js';
+import { checkoutService ,decodeJwt} from './checkoutService.js';
 import express from 'express';
 
 const cartRouter = express.Router();

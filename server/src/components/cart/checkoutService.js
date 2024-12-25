@@ -5,8 +5,6 @@ async function decodeJwt(token) {
     return jwt.verify(token, process.env.JWT_SECRET_KEY);
 }
 
-
-
 async function checkoutService({accountId}) {
 
   return prisma.$transaction(async (prisma) => {
