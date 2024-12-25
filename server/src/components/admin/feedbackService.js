@@ -26,12 +26,29 @@ async function replyFeedback(email, content) {
     }
 }
 async function fetchFeedback() {
-    return await prisma.feedback.findMany({
+    const feedback = await prisma.feedback.findMany({
         select: {
             account_id: true,
             content: true,
             type_id: true,
         },
+        include: {
+            account: {
+                select: {
+                    email: true,
+                    username: true,
+                },
+            },
+        },
+        
+    });
+    const feedbacks = feedback.map((item) => {
+        return {
+            email: item.account.email,
+            username: item.account.username,
+            content: item.content,
+            type_id: item.type_id,
+        };
     });
 }
 
