@@ -112,11 +112,11 @@ model product {
 
 model product_image {
   product_id     Int
-  url            String   @db.VarChar(100)
+  public_id      String   @db.VarChar(100)
   is_profile_img Boolean? @default(false)
   product        product  @relation(fields: [product_id], references: [id], onDelete: Cascade, map: "product_image_ibfk_1")
 
-  @@id([product_id, url])
+  @@id([product_id, public_id])
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.

@@ -1,4 +1,4 @@
-import { findUserByEmail, createUser, comparePasswords, generateToken, changeUserPassword, findUserByUsername, decodeJwt } from './authService.js';
+import { findUserByEmail, createUser, comparePasswords, generateToken, changeUserPassword, findUserByUsername, decodeJwt,checkMailExist } from './authService.js';
 import express from 'express';
 import crypto from 'crypto';
 import { sendResetEmail } from './sendEmail.js';
@@ -9,6 +9,8 @@ const authRouter = express.Router();
 // Login route
 authRouter.post("/login", async (req, res) => {
     const { email, password } = req.body;
+    console.log('email:', email);
+    console.log('password:', password);
 
     if (!email || !password) {
         return res.status(400).json({ message: 'Email and password are required.' });
@@ -16,9 +18,12 @@ authRouter.post("/login", async (req, res) => {
 
     try {
         const user = await findUserByEmail(email);
+        if (!user ) {
+            return res.status(401).json({ message: 'Incorrect email or password' });
+        }
         const isMatch = await comparePasswords(password, user.password);
 
-        if (!isMatch || !user) {
+        if (!isMatch) {
             return res.status(401).json({ message: 'Incorrect email or password' });
         }
 
@@ -53,6 +58,11 @@ authRouter.post("/register", async (req, res) => {
     }
 
     try {
+        const checkMail = await checkMailExist(email);
+        console.log('checkMail:', checkMail);
+        if (!checkMail) {
+            return res.status(400).json({ message: 'Email is invalid.' });
+        }
         const userByUsername = await findUserByUsername(username);
 
         const user = await findUserByEmail(email);
