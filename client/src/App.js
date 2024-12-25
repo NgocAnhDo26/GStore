@@ -11,6 +11,7 @@ import Products from "./pages/Products";
 import UserProfile from "./pages/user-profile";
 import Checkout from "./pages/checkout";
 import SupportPage from "./pages/support-page";
+import Admin from "./pages/admin";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import PrivateRoute from "./routes/route";
 
