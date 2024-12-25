@@ -48,7 +48,7 @@ const Filters = (props) => {
     }
 
     return (
-        <div className="flex flex-col justify-center self-start p-5 bg-gradient-to-b from-[#213478] to-[#1B1A55] rounded-md m-2 gap-3 text-white w-1/4">
+        <div className="flex flex-col justify-center self-start p-5 bg-gradient-to-br from-[#a26bdbbd]/80 to-[#3247d4b3]/80 rounded-md m-2 gap-3 text-white w-1/4 shadow-md">
             <h1 className="font-bold text-2xl">Filters</h1>
             <div>
                 <h2 className="text-xl my-2">Categories</h2>

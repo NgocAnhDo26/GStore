@@ -1,7 +1,8 @@
 // App.js
 import React from "react";
-import AuthProvider from "./hooks/AuthProvider";
 import GuestGuard from "./hooks/GuestGuard";
+import AuthProvider from "./hooks/AuthProvider";
+import CartProvider from "./hooks/CartProvider";
 
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
@@ -13,27 +14,32 @@ import Checkout from "./pages/checkout";
 import SupportPage from "./pages/support-page";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import PrivateRoute from "./routes/route";
+import ShoppingCart from "./pages/ShoppingCart";
 
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Home />} />
-            <Route path="/home" element={<Home />} />
-            <Route element={<GuestGuard />}>
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
+        <CartProvider>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Home />} />
+              <Route path="/home" element={<Home />} />
+              <Route element={<GuestGuard />}>
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+              </Route>
+              <Route path="/products" element={<Products />} />
+              <Route path="/cart" element={<ShoppingCart />} />
+              <Route path="/customer-service" element={<SupportPage />} />
+              <Route element={<PrivateRoute />}>
+                <Route path="/profile" element={<UserProfile />} />
+                <Route path="/checkout" element={<Checkout />} />
+              </Route>
+              <Route path="*" element={<div class="flex-1"></div>} />
             </Route>
-            <Route path="/products" element={<Products />} />
-            <Route element={<PrivateRoute />}>
-              <Route path="/profile" element={<UserProfile />} />
-              <Route path="/checkout" element={<Checkout />} />
-            </Route>
-            <Route path="*" element={<div class="flex-1"></div>} />
-          </Route>
-        </Routes>
+          </Routes>
+        </CartProvider>
       </AuthProvider>
     </BrowserRouter>
   );

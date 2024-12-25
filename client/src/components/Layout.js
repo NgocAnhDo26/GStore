@@ -8,7 +8,7 @@ const Layout = () => {
     const location = useLocation();
 
     return (
-        <div className="flex flex-col bg-custom-dark1 min-h-screen">
+        <div className="flex flex-col bg-[url('../public/img/tile_bg_winter_2024_b.webp')] min-h-screen">
             {location.pathname !== '/special-page' && <Header />}
             <Outlet />
             {location.pathname !== '/special-page' && <Footer />}

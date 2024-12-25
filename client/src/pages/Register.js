@@ -99,7 +99,8 @@ const Register = () => {
     };
 
     return (
-        <div className="flex flex-col rounded-md items-center mx-10 my-16 py-10 px-12 bg-gradient-to-t from-blue1 to-form-pink w-[26rem] self-center flex-1 text-white">
+
+        <div className="flex flex-col rounded-md items-center mx-10 my-16 py-10 px-12 bg-gradient-to-t from-blue1/80 to-form-pink/80 w-[26rem] self-center flex-1 text-white shadow-md">
             <h1 className=" text-4xl font-bold">GStore</h1>
             <h1 className=" text-2xl">Create your new account!</h1>
             <form onSubmit={handleSubmitEvent} className="pt-8 w-full">
@@ -164,7 +165,7 @@ const Register = () => {
 
             <p className="mb-5">Already got an account? <span><Link to="/login" className="font-bold hover:opacity-70">Login</Link></span></p>
         </div>
-    )
+    );
 }
 
 export default Register;

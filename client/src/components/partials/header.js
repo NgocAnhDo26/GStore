@@ -15,8 +15,12 @@ const Header = () => {
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
 
-  const toggleCategoryDropDown = () => {
-    setIsCategoryOpen(!isCategoryOpen);
+  const openCategoryDropDown = () => {
+    setIsCategoryOpen(true);
+  }
+
+  const closeCategoryDropDown = () => {
+    setIsCategoryOpen(false);
   }
 
   const openProfileDropdown = () => {
@@ -33,18 +37,18 @@ const Header = () => {
   }
 
   const categoryItems = [
-    { title: "Action", link: "/" },
-    { title: "RPG", link: "/" },
-    { title: "Simulation", link: "/" },
-    { title: "Casual", link: "/" },
-    { title: "FPS", link: "/" },
+    { title: "Action", link: '/products?category=action' },
+    { title: "RPG", link: '/products?category=rpg' },
+    { title: "Simulation", link: '/products?category=simulation' },
+    { title: "Casual", link: '/products?category=casual' },
+    { title: "FPS", link: '/products?category=fps' },
   ]
 
   const Categories = () => {
     return (
-      <div className="absolute flex flex-col bg-blue1 bg-opacity-90 backdrop-blur-sm py-3 mt-2 rounded-md">
+      <div className="absolute flex flex-col bg-blue1 bg-opacity-90 backdrop-blur-sm py-3 rounded-md mt-[15.5rem]">
         {categoryItems.map((item) => (
-          <Link to={item.href}>
+          <Link to={item.link}>
             <p className="hover:bg-btn-blue2 px-5 py-2">
               {item.title}
             </p>
@@ -130,22 +134,16 @@ const Header = () => {
           Games Collection
         </NavLink>
 
-        <div>
-          <button className="flex flex-row items-center gap-2" onClick={toggleCategoryDropDown}>
+        <div onMouseEnter={openCategoryDropDown} onMouseLeave={closeCategoryDropDown} className="flex items-center">
+          <a className="flex flex-row items-center gap-2">
             Categories
             <IconContext.Provider value={{ color: "white" }}>
-              {isCategoryOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}
+              <IoIosArrowDown />
             </IconContext.Provider>
 
-          </button>
+          </a>
           {isCategoryOpen && <Categories />}
         </div>
-
-        <NavLink to="/hot-games" className={({ isActive }) =>
-          isActive ? "font-bold" : ""
-        }>
-          Hot Games
-        </NavLink>
 
         <NavLink to="/customer-service" className={({ isActive }) =>
           isActive ? "font-bold" : ""

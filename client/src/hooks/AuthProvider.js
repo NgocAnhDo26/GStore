@@ -17,23 +17,27 @@ const AuthProvider = ({ children }) => {
 
     const navigate = useNavigate();
 
-    const handleLogin = (data) => {
-        axios.post("http://localhost:1111/auth/login", data).then((response) => {
-            localStorage.setItem("user", JSON.stringify(response.data.user));
-            setUser(response.data.user);
-            Swal.fire({
-                icon: "success",
-                title: "Success",
-                text: "Login successful!"
-            }).then(() => navigate("/"));
-        }).catch((error) => {
-            console.log(error);
-            Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                text: error.response.data.message
+    const handleLogin = async (data) => {
+        axios.post("http://localhost:1111/auth/login", data)
+            .then((response) => {
+                localStorage.setItem("user", JSON.stringify(response.data.user));
+                setUser(response.data.user);
+
+                Swal.fire({
+                    icon: "success",
+                    title: "Success",
+                    text: "Login successful!"
+                }).then(() => {
+                    navigate("/");
+                });
+            }).catch((error) => {
+                console.log(error);
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: error.response.data.message
+                });
             });
-        });
     }
 
     const handleLogout = () => {
