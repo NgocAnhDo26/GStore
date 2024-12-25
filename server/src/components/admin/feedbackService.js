@@ -3,7 +3,12 @@ import { prisma } from '../../config/config.js';
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-async function replyFeedback(email, content) {
+
+
+
+async function replyFeedback( email, content) {
+
+
     const msg = {
         to: email,
         from: {
@@ -28,28 +33,26 @@ async function replyFeedback(email, content) {
 async function fetchFeedback() {
     const feedback = await prisma.feedback.findMany({
         select: {
-            account_id: true,
             content: true,
             type_id: true,
-        },
-        include: {
-            account: {
+            account: { 
                 select: {
                     email: true,
                     username: true,
                 },
             },
         },
-        
     });
-    const feedbacks = feedback.map((item) => {
-        return {
-            email: item.account.email,
-            username: item.account.username,
-            content: item.content,
-            type_id: item.type_id,
-        };
-    });
+
+    const feedbacks = feedback.map((item) => ({
+        email: item.account?.email || null,
+        username: item.account?.username || null,
+        content: item.content,
+        type_id: item.type_id,
+    }));
+
+    return feedbacks;
 }
+
 
 export { replyFeedback,fetchFeedback };

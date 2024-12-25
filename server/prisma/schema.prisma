@@ -20,8 +20,10 @@ model account {
   is_lock        Boolean          @default(false)
   is_admin       Boolean          @default(false)
   cart           cart[]
+  feedback       feedback[]
   orders         orders[]
   product_review product_review[]
+  wishlist       wishlist[]
 }
 
 model cart {
@@ -58,8 +60,10 @@ model feedback {
   create_time   DateTime?     @default(now()) @db.Timestamp(0)
   type_id       Int           @default(1)
   feedback_type feedback_type @relation(fields: [type_id], references: [id], map: "feedback_ibfk_1")
+  account       account       @relation(fields: [account_id], references: [id], map: "feedback_ibfk_2")
 
   @@index([type_id], map: "type_id")
+  @@index([account_id], map: "feedback_ibfk_2")
 }
 
 model feedback_type {
@@ -106,6 +110,7 @@ model product {
   publisher        publisher          @relation(fields: [publisher_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_product_publisher")
   product_image    product_image[]
   product_review   product_review[]
+  wishlist         wishlist[]
 
   @@index([publisher_id], map: "idx_publisher")
 }
@@ -143,6 +148,9 @@ model wishlist {
   account_id   Int
   product_id   Int
   created_time DateTime @default(now()) @db.Timestamp(0)
+  account      account  @relation(fields: [account_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_account")
+  product      product  @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_product")
 
   @@id([account_id, product_id])
+  @@index([product_id], map: "fk_product")
 }

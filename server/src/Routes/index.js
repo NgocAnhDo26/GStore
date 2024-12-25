@@ -9,7 +9,7 @@ const router = express.Router();
 
 router.use("/auth", authController);
 
-router.use("/admin", authorize(true), adminRoute);
+router.use("/admin",  adminRoute);
 
 router.use("/profile", profileRoute);
 
