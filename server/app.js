@@ -1,10 +1,10 @@
 import "./src/config/config.js";
-
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-
+import passport from "passport";
 import router from "./src/Routes/index.js";
+import { prisma } from "./src/config/config.js";
 
 const app = express();
 
@@ -13,6 +13,7 @@ app.use(express.urlencoded({ extended: false })); // Parse URL-encoded bodies
 app.use(express.json()); // Parse JSON bodies
 app.use(cors()); // Enable CORS
 app.use(cookieParser()); // Enable cookie parser
+app.use(passport.initialize());
 
 // Init routes
 app.use("/", router);

@@ -22,6 +22,7 @@ model account {
   cart           cart[]
   orders         orders[]
   product_review product_review[]
+  wishlist       wishlist[]
 }
 
 model cart {
@@ -106,17 +107,18 @@ model product {
   publisher        publisher          @relation(fields: [publisher_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_product_publisher")
   product_image    product_image[]
   product_review   product_review[]
+  wishlist         wishlist[]
 
   @@index([publisher_id], map: "idx_publisher")
 }
 
 model product_image {
   product_id     Int
-  url            String   @db.VarChar(100)
+  public_id      String   @db.VarChar(100)
   is_profile_img Boolean? @default(false)
   product        product  @relation(fields: [product_id], references: [id], onDelete: Cascade, map: "product_image_ibfk_1")
 
-  @@id([product_id, url])
+  @@id([product_id, public_id])
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
@@ -143,6 +145,9 @@ model wishlist {
   account_id   Int
   product_id   Int
   created_time DateTime @default(now()) @db.Timestamp(0)
+  account      account  @relation(fields: [account_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_account")
+  product      product  @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_product")
 
   @@id([account_id, product_id])
+  @@index([product_id], map: "fk_product")
 }

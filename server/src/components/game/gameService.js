@@ -1,7 +1,8 @@
 import { prisma } from "../../config/config.js";
+import { getImage } from "../util/util.js";
 
 // Function to fetch products with filters (query)
-export async function fetchProductWithQuery(params, query) {
+export async function fetchProductWithQuery(query) {
   let filters = {
     AND: [],
   };
@@ -67,9 +68,8 @@ export async function fetchProductWithQuery(params, query) {
       price: true,
       price_sale: true,
       product_image: {
-        select: { url: true },
+        select: { public_id: true },
         where: { is_profile_img: true },
-        take: 1,
       },
       category_product: {
         select: {
@@ -86,7 +86,7 @@ export async function fetchProductWithQuery(params, query) {
   });
 
   if (!products.length) {
-    return []; // empty products
+    return []; // Empty products
   }
 
   // Process products to include average rating and category names
@@ -96,7 +96,7 @@ export async function fetchProductWithQuery(params, query) {
       0,
     );
     const averageRating = product.product_review.length
-      ? Math.round((totalRating / product.product_review.length) * 10) / 10 // round to 1 decimal place
+      ? Math.round((totalRating / product.product_review.length) * 10) / 10 // Round to 1 decimal place
       : null;
 
     const categoryNames = product.category_product.map(
@@ -108,7 +108,7 @@ export async function fetchProductWithQuery(params, query) {
       name: product.name,
       price: product.price,
       price_sale: product.price_sale,
-      profile_img: product.product_image[0]?.url || null,
+      profile_img: getImage(product.product_image[0]?.public_id),
       averageRating,
       categories: categoryNames,
     };
@@ -148,7 +148,7 @@ export async function fetchProductWithQuery(params, query) {
 
   // Return paginated products
   if (!filteredProducts.length) {
-    return []; // empty products
+    return []; // Empty products
   }
   return {
     products: filteredProducts.slice(offset, offset + limit),
@@ -162,7 +162,7 @@ export async function fetchProductByID(productID) {
   // Fetch the product details
   const product = await prisma.product.findUnique({
     where: {
-      id: Number(productID),
+      id: productID,
     },
     select: {
       id: true,
@@ -187,9 +187,11 @@ export async function fetchProductByID(productID) {
       },
       product_image: {
         select: {
-          url: true,
+          public_id: true,
         },
-        orderBy: { is_profile_img: "desc" },
+        where: {
+          is_profile_img: true,
+        },
       },
       product_review: {
         select: {
@@ -227,8 +229,10 @@ export async function fetchProductByID(productID) {
       create_time: product.create_time,
       publisher: product.publisher.name,
       categories: product.category_product.map((item) => item.category.name),
-      profile_img: product.product_image[0].url,
-      other_img: product.product_image.slice(1).map((item) => item.url),
+      profile_img: getImage(product.product_image[0].public_id),
+      other_img: product.product_image
+        .slice(1)
+        .map((item) => getImage(item.public_id)),
       product_review: product.product_review.map((item) => ({
         username: item.account.username,
         create_time: item.create_time,
@@ -239,7 +243,46 @@ export async function fetchProductByID(productID) {
     formattedProducts.averageRating = averageRating;
     return formattedProducts;
   }
-  return {}; // empty product
+  return {}; // Empty product
+}
+
+export async function fetchProductByListID(listID) {
+  const { listProductID } = listID;
+  const products = await prisma.product.findMany({
+    select: {
+      id: true,
+      name: true,
+      publisher: {
+        select: {
+          name: true,
+        },
+      },
+      product_image: {
+        select: {
+          public_id: true,
+        },
+        where: {
+          is_profile_img: true,
+        },
+      },
+      price: true,
+      price_sale: true,
+    },
+    where: {
+      id: {
+        in: listProductID,
+      },
+    },
+  });
+  const formattedProducts = products.map((product) => ({
+    id: product.id,
+    name: product.name,
+    price: product.price,
+    price_sale: product.price_sale,
+    publisher: product.publisher.name,
+    profile_img: getImage(product.product_image[0].public_id),
+  }));
+  return formattedProducts;
 }
 
 export async function fetchBestSellersProducts() {
@@ -251,16 +294,15 @@ export async function fetchBestSellersProducts() {
       price_sale: true,
       product_image: {
         select: {
-          url: true,
+          public_id: true,
         },
         where: {
           is_profile_img: true,
         },
-        take: 1,
       },
     },
     orderBy: {
-      sales: "desc", // the most sale products
+      sales: "desc", // The most sale products
     },
     take: 12,
   });
@@ -269,20 +311,39 @@ export async function fetchBestSellersProducts() {
     name: product.name,
     price: product.price,
     price_sale: product.price_sale,
-    profile_img: product.product_image[0]?.url || null,
+    profile_img: getImage(product.product_image[0]?.public_id),
   }));
 }
 
 export async function fetchFeatureProducts() {
   const products = await prisma.$queryRaw`
-  SELECT p.id, p.name, p.price, p.price_sale, pi.url as profile_img
+  SELECT p.id, p.name, p.price, p.price_sale, pi.public_id as profile_img
   FROM product p
   JOIN product_image pi on p.id = pi.product_id
   LEFT JOIN product_review pr ON p.id = pr.product_id
   WHERE pi.is_profile_img = true
-  GROUP BY p.id, pi.url
+  GROUP BY p.id, pi.public_id
   ORDER BY COALESCE(AVG(pr.rating), 0) DESC
   LIMIT 12;
 `;
   return products;
+}
+
+// Fetch categories and number of games in each category
+export async function fetchCategories() {
+  const categories = await prisma.category.findMany({
+    select: {
+      name: true,
+      _count: {
+        select: {
+          category_product: true,
+        },
+      },
+    },
+  });
+  const formattedCategories = categories.map((category) => ({
+    name: category.name,
+    count: category._count.category_product,
+  }));
+  return formattedCategories;
 }

@@ -42,4 +42,16 @@ async function checkProductInWishlist({ userId, productId }) {
         },
     });
 }
-export { decodeJwt, addToWishlist, removeFromWishlist, checkProductInWishlist };
+async function fetchproductIdFromWishlist({ userId }) {
+    const productId= await prisma.wishlist.findMany({
+        where: {
+            account_id: userId,
+        },
+        select: {
+            product_id: true,
+        },
+    })
+    const productIds = productId.map((item) => item.product_id);
+    return productIds;
+}
+export { decodeJwt, addToWishlist, removeFromWishlist, checkProductInWishlist,fetchproductIdFromWishlist };

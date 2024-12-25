@@ -1,8 +1,9 @@
 import feedbackController from "../components/user/userController/feedbackController.js";
-
+import { authorize } from "../components/auth/verifyRoute.js";
 import express from "express";
+
 const router = express.Router();
 
-router.use("/feedback", feedbackController);
-export default router;
+router.use("/feedback", authorize(), feedbackController);
 
+export default router;

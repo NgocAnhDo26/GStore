@@ -1,4 +1,4 @@
-import {addToWishlist, removeFromWishlist, decodeJwt ,checkProductInWishlist } from './wishlistService.js';
+import { addToWishlist, removeFromWishlist, decodeJwt, checkProductInWishlist, fetchproductIdFromWishlist } from './wishlistService.js';
 import express from 'express';
 
 
@@ -43,6 +43,18 @@ userRouter.delete("/remove-from-wishlist", async (req, res) => {
         res.status(500).json({ message: 'An error occurred, please try again later.' });
     }
 });
+userRouter.get("/fetch-id-from-wishlist", async (req, res) => {
+    const token = req.cookies.authToken;
+    try {
+        const decoded = await decodeJwt(token);
+        const wishlist = await fetchproductIdFromWishlist({ userId: decoded._id });
+        res.status(200).json({ wishlist });
+    } catch (err) {
+        console.error('Fetch wishlist error:', err);
+        res.status(500).json({ message: 'An error occurred, please try again later.' });
+    }
+});
+
 
 
 export default userRouter;

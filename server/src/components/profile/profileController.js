@@ -99,7 +99,7 @@ async function getPurchaseHistory(req, res) {
     }
   
     profileService
-      .fetchHistoryWithQuery(Number(id))
+      .fetchHistoryWithQuery(Number(id),req.query)
       .then((purchaseHistory) => {
         return res.status(200).json(purchaseHistory || []);
       })
