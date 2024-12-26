@@ -46,8 +46,8 @@ model category {
 model category_product {
   category_id Int
   product_id  Int
-  category    category @relation(fields: [category_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_category_product_category")
-  product     product  @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_category_product_product")
+  category    category @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_category_product_category")
+  product     product  @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_category_product_product")
 
   @@id([category_id, product_id])
   @@index([product_id], map: "idx_category_product_product")
@@ -106,6 +106,7 @@ model product {
   publisher_id     Int
   cart             cart[]
   category_product category_product[]
+  key_game         key_game[]
   order_product    order_product[]
   publisher        publisher          @relation(fields: [publisher_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_product_publisher")
   product_image    product_image[]
@@ -153,4 +154,15 @@ model wishlist {
 
   @@id([account_id, product_id])
   @@index([product_id], map: "fk_product")
+}
+
+model key_game {
+  id          Int      @id @default(autoincrement())
+  product_id  Int
+  key_code    String   @unique(map: "unique_key_code") @db.VarChar(255)
+  is_used     Boolean  @default(false)
+  create_time DateTime @default(now()) @db.Timestamp(0)
+  product     product  @relation(fields: [product_id], references: [id], onDelete: Cascade, map: "fk_key_game_product")
+
+  @@index([product_id], map: "idx_product")
 }
