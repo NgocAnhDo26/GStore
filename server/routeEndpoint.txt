@@ -1,0 +1,19 @@
+1. Product listing, search, filter
+- if no query, fetch all games; else fetch with Url query, filter, and search: get http://localhost:2000/api/product/
+- Feature product: get http://localhost:2000/api/product/feature-product/
+- Bestseller, hot games: get http://localhost:2000/api/product/bestseller/
+- categories and number of games in each category: get http://localhost:2000/api/product/category/
+- List products (fetch by list of id): get http://localhost:2000/api/product/list-productID/
+- Single product (fetch by product_id): get http://localhost:2000/api/product/:product_id/
+2. Shopping cart
+- Fetch all games: get http://localhost:2000/api/cart/:account_id
+- Add new game: post http://localhost:2000/api/cart/:account_id/item/:product_id
+- Remove game: delete http://localhost:2000/api/cart/:account_id/item/:product_id
+- update game quantity: put http://localhost:2000/api/cart/ (req.body = {account_id, product_id, quantity})
+3. Admin
+- Fetch all games: get http://localhost:2000/admin/product/
+- Add new game: post http://localhost:2000/admin/product/ (req.body = {name, description, price, price_sale, in_stock, publisher_name, categories, images})
+- Update game: put http://localhost:2000/admin/product/ (req.body = {name, description, price, price_sale, in_stock, publisher_name, categories, images, old_images})
+- Fetch all game sales: get http://localhost:2000/admin/product/sale/
+- Remove game: delete http://localhost:2000/admin/product/:product_id
+- Fetch single game: get http://localhost:2000/admin/product/:product_id

@@ -1,4 +1,4 @@
-import { findUserByEmail, createUser, comparePasswords, generateToken, changeUserPassword, findUserByUsername, decodeJwt } from './authService.js';
+import { findUserByEmail, createUser, comparePasswords, generateToken, changeUserPassword, findUserByUsername, decodeJwt,checkMailExist } from './authService.js';
 import express from 'express';
 import crypto from 'crypto';
 import { sendResetEmail } from './sendEmail.js';
@@ -9,23 +9,27 @@ const authRouter = express.Router();
 // Login route
 authRouter.post("/login", async (req, res) => {
     const { email, password } = req.body;
+   
 
-    if (!email || !password) {
-        return res.status(400).json({ message: 'Email and password are required.' });
-    }
+  if (!email || !password) {
+    return res
+      .status(400)
+      .json({ message: "Email and password are required." });
+  }
+
+  
 
     try {
         const user = await findUserByEmail(email);
-
-        if (!user) {
-            return res.status(401).json({ message: 'Invalid email' });
+        if (!user ) {
+            return res.status(401).json({ message: 'Incorrect email or password' });
         }
-
         const isMatch = await comparePasswords(password, user.password);
 
         if (!isMatch) {
-            return res.status(401).json({ message: 'Incorrect password' });
+            return res.status(401).json({ message: 'Incorrect email or password' });
         }
+        console.log("user",user);
 
         const token = generateToken(user);
 
@@ -47,18 +51,32 @@ authRouter.post("/login", async (req, res) => {
         console.error('Login error:', err);
         res.status(500).json({ message: 'An error occurred, please try again later.' });
     }
+
+ 
 });
 
 // Register route
 authRouter.post("/register", async (req, res) => {
-    const { username, email, password } = req.body;
+  const { username, email, password } = req.body;
 
-    if (!email || !password) {
-        return res.status(400).json({ message: 'Email and password are required.' });
-    }
+  if (!email || !password) {
+    return res
+      .status(400)
+      .json({ message: "Email and password are required." });
+  }
 
     try {
+        const checkMail = await checkMailExist(email);
+        if (!checkMail) {
+            return res.status(400).json({ message: 'Email is invalid.' });
+        }
+        const userByUsername = await findUserByUsername(username);
+
         const user = await findUserByEmail(email);
+
+        if (userByUsername) {
+            return res.status(400).json({ message: 'Username already exists' });
+        }
 
         if (user) {
             return res.status(400).json({ message: 'Email already exists' });
@@ -75,64 +93,71 @@ authRouter.post("/register", async (req, res) => {
 
 // Logout route
 authRouter.post("/logout", async (req, res) => {
-    res.clearCookie('authToken');
-    res.status(200).json({ message: 'Logout successful' });
+  res.clearCookie("authToken");
+  res.status(200).json({ message: "Logout successful" });
 });
 
 // Change password route
-authRouter.post("/change-password", async (req, res) => {
-    const { oldPassword, newPassword } = req.body;
-    const token = req.cookies.authToken;
+authRouter.post("/security", async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+  const token = req.cookies.authToken;
 
-    if (!oldPassword || !newPassword) {
-        return res.status(400).json({ message: 'Old password and new password are required.' });
+  if (!oldPassword || !newPassword) {
+    return res
+      .status(400)
+      .json({ message: "Old password and new password are required." });
+  }
+
+  try {
+    const decoded = await decodeJwt(token);
+    const userId = decoded._id;
+
+    const user = await findUserByEmail(decoded.email);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
 
-    try {
-        const decoded = await decodeJwt(token);
-        console.log('decoded:', decoded);
-        const userId = decoded._id;
+    const isMatch = await comparePasswords(oldPassword, user.password);
 
-        const user = await findUserByEmail(decoded.email);
-
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        const isMatch = await comparePasswords(oldPassword, user.password);
-
-        if (!isMatch) {
-            return res.status(401).json({ message: 'Old password is incorrect' });
-        }
-
-        await changeUserPassword(userId, newPassword);
-
-        res.status(200).json({ message: 'Password changed successfully' });
-    } catch (err) {
-        console.error('Change password error:', err);
-        if (err.name === 'JsonWebTokenError') {
-            return res.status(401).json({ message: 'Invalid or expired token' });
-        }
-        res.status(500).json({ message: 'An error occurred, please try again later.' });
+    if (!isMatch) {
+      return res.status(401).json({ message: "Old password is incorrect" });
     }
+
+    await changeUserPassword(userId, newPassword);
+
+    res.status(200).json({ message: "Password changed successfully" });
+  } catch (err) {
+    console.error("Change password error:", err);
+    if (err.name === "JsonWebTokenError") {
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
+    res
+      .status(500)
+      .json({ message: "An error occurred, please try again later." });
+  }
 });
 authRouter.post("/forgot-password", async (req, res) => {
-    const { email } = req.body;
+  const { email } = req.body;
 
-    try {
-        const user = await findUserByEmail(email);
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-        const newPassword = crypto.randomBytes(8).toString('hex');
-        await changeUserPassword(user.id, newPassword);
-        await sendResetEmail(email, newPassword);
-
-        res.status(200).json({ message: 'New password sent to your email successfully' });
-    } catch (error) {
-        console.error('Error:', error);
-        res.status(500).json({ message: 'An error occurred, please try again later.' });
+  try {
+    const user = await findUserByEmail(email);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
+    const newPassword = crypto.randomBytes(8).toString("hex");
+    await changeUserPassword(user.id, newPassword);
+    await sendResetEmail(email, newPassword);
+
+    res
+      .status(200)
+      .json({ message: "New password sent to your email successfully" });
+  } catch (error) {
+    console.error("Error:", error);
+    res
+      .status(500)
+      .json({ message: "An error occurred, please try again later." });
+  }
 });
 authRouter.get("/check-exist-email", async (req, res) => {
 
@@ -147,6 +172,8 @@ authRouter.get("/check-exist-email", async (req, res) => {
         console.error('Error:', error);
         res.status(500).json({ message: 'An error occurred, please try again later.' });
     }
+    res.status(200).json({ message: "Email is available" });
+  
 });
 authRouter.get("/check-exist-username", async (req, res) => {
     const { username } = req.query;
@@ -160,8 +187,8 @@ authRouter.get("/check-exist-username", async (req, res) => {
         console.error('Error:', error);
         res.status(500).json({ message: 'An error occurred, please try again later.' });
     }
+    res.status(200).json({ message: "Username is available" });
+  
 });
-
-
 
 export default authRouter;

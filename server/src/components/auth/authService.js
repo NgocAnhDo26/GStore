@@ -1,6 +1,7 @@
 import { prisma } from '../../config/config.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import mailChecker from 'mailchecker';
 
 async function findUserByEmail(email) {
     return await prisma.account.findUnique({ where: { email } });
@@ -19,7 +20,9 @@ async function createUser({ username, email, password }) {
         }
     });
 }
-
+async function checkMailExist(email) {
+    return mailChecker.isValid(email);
+}
 async function comparePasswords(inputPassword, userPassword) {
     return await bcrypt.compare(inputPassword, userPassword);
 }
@@ -51,5 +54,6 @@ export {
     comparePasswords,
     generateToken,
     changeUserPassword,
-    decodeJwt
+    decodeJwt,
+    checkMailExist
 };
