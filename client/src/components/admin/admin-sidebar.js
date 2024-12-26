@@ -124,7 +124,9 @@ const AdminSidebar = ({ activeSection, onSectionChange }) => {
                     <a
                       onClick={() => onSectionChange(item.section)}
                       href="#"
-                      className="flex items-center p-2 text-white rounded-lg hover:bg-white group"
+                      className={`flex items-center p-2 text-white rounded-lg hover:bg-white group
+                        ${activeSection === item.section ? "bg-black" : ""}`}
+
                     >
                       <svg
                         className="w-5 h-5 transition duration-75 group-hover:text-blue1"
