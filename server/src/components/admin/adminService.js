@@ -22,7 +22,7 @@ export async function addNewProduct(product, images) {
     !categories.length ||
     !images.length
   ) {
-    return { message: "Missing fields" };
+    throw new Error("Missing fields");
   }
 
   const existGame = await prisma.product.findUnique({
@@ -31,7 +31,7 @@ export async function addNewProduct(product, images) {
   });
 
   if (existGame) {
-    return { message: "Game already exists" };
+    throw new Error("Game already exists");
   }
 
   const publisher = await prisma.publisher.upsert({
@@ -42,7 +42,7 @@ export async function addNewProduct(product, images) {
   });
 
   const newProduct = await prisma.product.create({
-    create: {
+    data: {
       name: name,
       description: description,
       price: Number(price),
@@ -84,7 +84,7 @@ export async function addNewProduct(product, images) {
         select: { id: true },
       });
       await prisma.category_product.create({
-        create: {
+        data: {
           category_id: category.id,
           product_id: newProduct.id,
         },
@@ -108,7 +108,7 @@ export async function editProduct(product, images) {
     old_images, // Send by public_id
   } = product;
   if (!id) {
-    return { message: "Missing product id" };
+    throw new Error("Missing product id");
   }
   const existGame = await prisma.product.findUnique({
     where: { id: Number(id) },
@@ -117,7 +117,7 @@ export async function editProduct(product, images) {
     },
   });
   if (!existGame) {
-    return { message: "Game is not available" };
+    throw new Error("Game is not available");
   }
 
   const publisher = await prisma.publisher.upsert({
@@ -142,11 +142,14 @@ export async function editProduct(product, images) {
   // Delete image
   if (old_images.length) {
     await Promise.all(
-      old_images.map((public_id) => {
+      old_images.map(async (public_id) => {
         // Remove old image from db
-        prisma.product_image.delete({
+        await prisma.product_image.delete({
           where: {
-            public_id: public_id,
+            product_id_public_id: {
+              product_id: Number(id),
+              public_id: public_id,
+            },
           },
         });
         // Delete old image from cloudinary
@@ -162,9 +165,9 @@ export async function editProduct(product, images) {
 
   if (images.length) {
     // Check if this product has profile image
-    const isExistProfileImg = await prisma.product_image.findUnique({
+    const isExistProfileImg = await prisma.product_image.findFirst({
       where: {
-        product_id: id,
+        product_id: Number(id),
         is_profile_img: true,
       },
     });
@@ -181,7 +184,7 @@ export async function editProduct(product, images) {
         });
         await prisma.product_image.create({
           data: {
-            product_id: id,
+            product_id: Number(id),
             public_id: result.public_id,
             is_profile_img: isExistProfileImg ? false : idx === 0,
           },
@@ -189,43 +192,47 @@ export async function editProduct(product, images) {
       }),
     );
   }
-  
-  if (categories.length) {
-    await Promise.all(
-      categories.map(async (cat) => {
-        // Add new category
-        const c = await prisma.category.upsert({
-          where: { name: cat },
-          update: {},
-          create: { name: cat },
-          select: { id: true },
-        });
-        // Remove old product category
-        await prisma.category_product
-          .delete({
-            where: {
-              category_id_product_id: {
-                category_id: c.id,
-                product_id: id,
-              },
-            },
-          })
-          .catch(async (err) => {
-            if (err.code === "P2015") {
-              // Prisma code P2015: "A related record could not be found. {details}"
-              // delete a not exist product category
-              // add new product category here
-              await prisma.category_product.create({
-                data: {
-                  category_id: c.id,
-                  product_id: id,
-                },
-              });
-            }
-          });
-      }),
-    );
+
+  // Update categories
+  const existingCategories = await prisma.category_product.findMany({
+    where: { product_id: Number(id) },
+    select: { category: { select: { name: true } } },
+  });
+
+  const existingCatNames = existingCategories.map((c) => c.category.name);
+
+  // Remove old categories
+  const toRemove = existingCatNames.filter(
+    (name) => !categories.includes(name),
+  );
+  if (toRemove.length) {
+    await prisma.category_product.deleteMany({
+      where: {
+        product_id: Number(id),
+        category: { name: { in: toRemove } },
+      },
+    });
   }
+
+  // Insert new categories
+  const toAdd = categories.filter((name) => !existingCatNames.includes(name));
+  if (toAdd.length) {
+    for (const cat of toAdd) {
+      const c = await prisma.category.upsert({
+        where: { name: cat },
+        update: {},
+        create: { name: cat },
+        select: { id: true },
+      });
+      await prisma.category_product.create({
+        data: {
+          category_id: c.id,
+          product_id: Number(id),
+        },
+      });
+    }
+  }
+
   return { message: "Product updated successfully" };
 }
 
@@ -241,29 +248,121 @@ export async function removeProduct(product_id) {
     where: { id: product_id },
   });
   if (!existGame) {
-    return { message: "Game is not available" };
+    throw new Error("Game is not available");
   }
-  await prisma.category_product.deleteMany({
-    where: { product_id: product_id },
-  });
-  // Delete images from cloudinary
+
+  // Delete images from Cloudinary
   await Promise.all(
-    existGame.product_image.map((image) => {
-      new Promise((resolve, reject) => {
-        cloudinary.uploader.destroy(image.public_id, (error, result) => {
-          if (error) reject(error);
-          resolve(result);
-        });
-      });
-    }),
+    existGame.product_image.map(
+      (image) =>
+        new Promise((resolve, reject) => {
+          cloudinary.uploader.destroy(image.public_id, (error, result) => {
+            if (error) reject(error);
+            resolve(result);
+          });
+        }),
+    ),
   );
-  await prisma.product_image.deleteMany({
-    where: { product_id: product_id },
-  });
+
+  // Cascading delete product
   await prisma.product.delete({
     where: { id: product_id },
   });
+
   return { message: "Game removed successfully" };
 }
 
-export async function viewGameSales() {}
+export async function viewGameSales(date) {
+  const { duration, dateStr } = date;
+  if (!["day", "month", "year"].includes(duration)) {
+    throw new Error("Missing or invalid duration");
+  }
+
+  // Parse dateStr "DD/MM/YYYY"
+  const [day, month, year] = dateStr.split("/").map(Number);
+  let fromDate, toDate;
+
+  if (duration === "day") {
+    fromDate = new Date(year, month - 1, day, 0, 0, 0);
+    toDate = new Date(year, month - 1, day, 23, 59, 59);
+  } else if (duration === "month") {
+    fromDate = new Date(year, month - 1, 1, 0, 0, 0);
+    toDate = new Date(year, month, 1, 0, 0, 0); // Next month
+  } else {
+    fromDate = new Date(year, 0, 1, 0, 0, 0);
+    toDate = new Date(year + 1, 0, 1, 0, 0, 0); // Next year
+  }
+
+  const data = await prisma.order_product.findMany({
+    where: {
+      orders: {
+        status: "completed",
+        create_time: { gte: fromDate, lte: toDate },
+      },
+    },
+    select: {
+      quantity: true,
+      product: {
+        select: {
+          id: true,
+          name: true,
+          price_sale: true,
+          category_product: {
+            select: {
+              category: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  let totalSales = 0;
+  let totalRevenue = 0;
+  const categoryMap = new Map();
+  const productMap = new Map();
+
+  for (const row of data) {
+    const { product } = row;
+    const sales = row.quantity;
+    const revenue = product.price_sale * row.quantity;
+    totalSales += sales;
+    totalRevenue += revenue;
+
+    if (!productMap.has(product.id)) {
+      productMap.set(product.id, { game: product.name, sales: 0, revenue: 0 });
+    }
+    productMap.get(product.id).sales += sales;
+    productMap.get(product.id).revenue += revenue;
+
+    for (const cp of product.category_product) {
+      const catName = cp.category.name;
+      if (!categoryMap.has(catName)) {
+        categoryMap.set(catName, { category: catName, sales: 0, revenue: 0 });
+      }
+      categoryMap.get(catName).sales += sales;
+      categoryMap.get(catName).revenue += revenue;
+    }
+  }
+
+  const saleByCategory = [...categoryMap.values()];
+  const saleByGame = [...productMap.values()];
+
+  return {
+    totalSale: { sales: totalSales, revenue: totalRevenue },
+    saleByCategorySortBySales: [...saleByCategory].sort(
+      (a, b) => b.sales - a.sales,
+    ),
+    saleByCategorySortByRevenue: [...saleByCategory].sort(
+      (a, b) => b.revenue - a.revenue,
+    ),
+    saleByGameSortBySales: [...saleByGame].sort((a, b) => b.sales - a.sales),
+    saleByGameSortByRevenue: [...saleByGame].sort(
+      (a, b) => b.revenue - a.revenue,
+    ),
+  };
+}
