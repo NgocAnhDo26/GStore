@@ -33,7 +33,7 @@ function generateToken(user) {
         email: user.email,
         isAdmin: user.is_admin,
     };
-    return jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
+    return jwt.sign(payload, process.env.JWT_SECRET_KEY);
 }
 
 async function changeUserPassword(userId, newPassword) {
