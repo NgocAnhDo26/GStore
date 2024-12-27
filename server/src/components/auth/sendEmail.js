@@ -7,9 +7,9 @@ async function sendResetEmail(email, newPassword) {
     to: email,
     from: {
       email: "phamhoangkha14032004@gmail.com",
-      name: "G-Store",
+      name: "GStore",
     },
-    subject: "Your new password in G-Store",
+    subject: "Your new password in GStore",
     text: `Your new password is: ${newPassword}`,
     html: `<p>Your new password is: <strong>${newPassword}</strong></p>`,
   };

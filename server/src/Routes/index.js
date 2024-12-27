@@ -1,16 +1,14 @@
-import { authorize } from "../components/auth/verifyRoute.js";
-import authController from "../components/auth/authController.js";
+import authController from "../components/auth/authController.js"; 
 import express from "express";
+import api from "./api.js";
+import adminRoute from "./admin.js";
 
 const router = express.Router();
 
 router.use("/auth", authController);
 
-router.get("/admin", authorize(true), (req, res) => {
-  res.status(200).json({ message: "Welcome Admin!" });
-});
+router.use("/admin", adminRoute);
 
-router.get("/profile", authorize(), (req, res) => {
-  res.status(200).json({ message: "Welcome User!", user: req.user });
-});
+router.use("/api", api);
+
 export default router;
