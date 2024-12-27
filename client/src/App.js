@@ -1,48 +1,24 @@
-// App.js
-import React from "react";
-import GuestGuard from "./hooks/GuestGuard";
-import AuthProvider from "./hooks/AuthProvider";
-import CartProvider from "./hooks/CartProvider";
-
-import Layout from "./components/Layout";
-import Home from "./pages/Home";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Products from "./pages/Products";
-import UserProfile from "./pages/user-profile";
-import Checkout from "./pages/checkout";
-import SupportPage from "./pages/support-page";
-import Admin from "./pages/admin";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import PrivateRoute from "./routes/route";
-import ShoppingCart from "./pages/ShoppingCart";
+import logo from './logo.svg';
+import './App.css';
 
 function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <CartProvider>
-          <Routes>
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Home />} />
-              <Route path="/home" element={<Home />} />
-              <Route element={<GuestGuard />}>
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-              </Route>
-              <Route path="/products" element={<Products />} />
-              <Route path="/cart" element={<ShoppingCart />} />
-              <Route path="/customer-service" element={<SupportPage />} />
-              <Route element={<PrivateRoute />}>
-                <Route path="/profile" element={<UserProfile />} />
-                <Route path="/checkout" element={<Checkout />} />
-              </Route>
-              <Route path="*" element={<div class="flex-1"></div>} />
-            </Route>
-          </Routes>
-        </CartProvider>
-      </AuthProvider>
-    </BrowserRouter>
+    <div className="App">
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <p>
+          Edit <code>src/App.js</code> and save to reload.
+        </p>
+        <a
+          className="App-link"
+          href="https://reactjs.org"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Learn React
+        </a>
+      </header>
+    </div>
   );
 }
 
