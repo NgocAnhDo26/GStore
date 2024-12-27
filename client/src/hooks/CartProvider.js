@@ -16,16 +16,16 @@ const CartProvider = ({ children }) => {
 
         } else {
             // Load guest cart product ids from localStorage
-            const guestCart = JSON.parse(localStorage.getItem("cart")) || [];
+            // const guestCart = JSON.parse(localStorage.getItem("cart")) || [];
 
-            // Fetch product details for guest cart from backend
-            axios.post("http://localhost:1111/products", {
-                productIds: guestCart.map((item) => item.id)
-            }).then((response) => {
-                setProducts(response.data.products);
-            }).catch((error) => {
-                console.log(error);
-            });
+            // // Fetch product details for guest cart from backend
+            // axios.post("http://localhost:1111/products", {
+            //     productIds: guestCart.map((item) => item.id)
+            // }).then((response) => {
+            //     setProducts(response.data.products);
+            // }).catch((error) => {
+            //     console.log(error);
+            // });
         }
     }, []);
 

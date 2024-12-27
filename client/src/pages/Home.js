@@ -23,14 +23,14 @@ const Home = () => {
             setFeaturedGames(res.data.products);
         });
         
-        // Fetch wishlist products id if user is logged in
-        if (user) {
-            axios.get("http://localhost:1111/wishlist").then((res) => {
-                setWishlisted(res.data.products);
-            });
-        } else {
-            setWishlisted([]);
-        }
+        // // Fetch wishlist products id if user is logged in
+        // if (user) {
+        //     axios.get("http://localhost:1111/wishlist").then((res) => {
+        //         setWishlisted(res.data.products);
+        //     });
+        // } else {
+        //     setWishlisted([]);
+        // }
     }, []);
 
 

@@ -18,7 +18,7 @@ const AuthProvider = ({ children }) => {
     const navigate = useNavigate();
 
     const handleLogin = async (data) => {
-        axios.post("http://localhost:1111/auth/login", data)
+        axios.post("http://localhost:1111/auth/login", data, { withCredentials: true })
             .then((response) => {
                 localStorage.setItem("user", JSON.stringify(response.data.user));
                 setUser(response.data.user);
@@ -40,10 +40,15 @@ const AuthProvider = ({ children }) => {
             });
     }
 
-    const handleLogout = () => {
-        localStorage.removeItem("user");
-        setUser(null);
-        navigate("/");
+    const handleLogout = async () => {
+        axios.post("http://localhost:1111/auth/logout", {}, { withCredentials: true })
+            .then(() => {
+                localStorage.removeItem("user");
+                setUser(null);
+                navigate("/");
+            }).catch((error) => {
+                console.log(error);
+            });
     }
 
     return (

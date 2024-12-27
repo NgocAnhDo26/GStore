@@ -1,8 +1,6 @@
 import { addToWishlist, removeFromWishlist, decodeJwt, checkProductInWishlist, fetchproductIdFromWishlist } from './wishlistService.js';
 import express from 'express';
 
-
-
 const userRouter = express.Router();
 userRouter.post("/add-to-wishlist", async (req, res) => {
     const { productId } = req.body;

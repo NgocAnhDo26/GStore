@@ -12,7 +12,7 @@ const ShoppingCart = () => {
             <div className="flex p-10">
                 {/* Item list */}
                 <div className="bg-gradient-to-br from-[#a26bdbbd]/80 to-[#3247d4b3]/80 flex-1 rounded-md text-white p-5">
-                    <table class="w-full">
+                    <table className="w-full">
                         <tr>
                             <th></th>
                             <th>Product</th>
