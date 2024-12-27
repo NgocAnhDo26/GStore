@@ -18,8 +18,10 @@ const Filters = (props) => {
     const maxLimit = 3000000;
 
     useEffect(() => {
-        axios.get('https://dummyjson.com/products/category-list')
+        axios.get('http://localhost:1111/api/product/category')
             .then((response) => {
+                // Sort categories by count
+                response.data.sort((a, b) => b.count - a.count);
                 setCategories(response.data);
             }).catch((error) => {
                 console.log(error);
@@ -53,19 +55,19 @@ const Filters = (props) => {
             <div>
                 <h2 className="text-xl my-2">Categories</h2>
                 <div className="flex flex-col">
-                    {categories.slice(0, 5).map((category) => (
-                        <div key={category} className="flex items-center ml-3 gap-2">
-                            <input type="checkbox" value={category} onChange={handleCategoryChange} checked={categoriesFilter.includes(category)} />
-                            <label>{category}</label>
-                            <p className="ml-auto">123</p>
+                    { categories !== undefined && categories.slice(0, 5).map((category) => (
+                        <div key={category.name} className="flex items-center ml-3 gap-2">
+                            <input type="checkbox" value={category.name} onChange={handleCategoryChange} checked={categoriesFilter.includes(category.name)} />
+                            <label>{category.name}</label>
+                            <p className="ml-auto">{category.count}</p>
                         </div>
                     ))}
 
-                    {showMore && categories.slice(5).map((category) => (
-                        <div key={category} className="flex items-center ml-3 gap-2">
-                            <input type="checkbox" value={category} onChange={handleCategoryChange} checked={categoriesFilter.includes(category)} />
-                            <label>{category}</label>
-                            <p className="ml-auto">123</p>
+                    {showMore && categories != undefined && categories.slice(5).map((category) => (
+                        <div key={category.name} className="flex items-center ml-3 gap-2">
+                            <input type="checkbox" value={category.name} onChange={handleCategoryChange} checked={categoriesFilter.includes(category.name)} />
+                            <label>{category.name}</label>
+                            <p className="ml-auto">{category.count}</p>
                         </div>
                     ))}
 

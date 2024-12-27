@@ -326,7 +326,13 @@ export async function fetchFeatureProducts() {
   ORDER BY COALESCE(AVG(pr.rating), 0) DESC
   LIMIT 12;
 `;
-  return products;
+  return products.map((product) => ({
+    id: product.id,
+    name: product.name,
+    price: product.price,
+    price_sale: product.price_sale,
+    profile_img: getImage(product.profile_img),
+  }));
 }
 
 // Fetch categories and number of games in each category
