@@ -29,7 +29,6 @@ async function updateUserInfo(req, res) {
   const token = req.cookies.authToken;
   const decoded = await profileService.decodeJwt(token);
   const id = decoded._id;
-
   if (!id) {
       return res.status(400).json({ error: 'Account ID is required' });
   }
@@ -37,7 +36,7 @@ async function updateUserInfo(req, res) {
   const { name, birthdate, phone } = req.body;
 
   const updateData = {};
-  if (name) updateData.name = name;
+  if (name) updateData.username = name;
   if (birthdate) {
       const dateObj = new Date(birthdate);
       if (!isNaN(dateObj)) {

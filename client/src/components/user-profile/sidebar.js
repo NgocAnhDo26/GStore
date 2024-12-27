@@ -34,7 +34,7 @@ const Sidebar = ({ activeSection, onSectionChange }) => {
         <button
           key={item.id}
           onClick={() => onSectionChange(item.section)}
-          className={`flex items-center justify-start space-x-5 rounded-2xl border-solid px-4 py-2 text-white transition duration-300 ${
+          className={`flex items-center justify-start space-x-2 rounded-2xl border-solid px-4 py-2 text-white transition duration-300 ${
             activeSection === item.section ? "bg-gray-700" : "bg-custom-dark2"
           }`}
         >

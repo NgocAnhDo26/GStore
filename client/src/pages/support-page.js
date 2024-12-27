@@ -32,7 +32,7 @@ const SupportPage = () => {
   };
 
   return (
-    <section className="bg-blue-500 m-8 rounded-md">
+    <section className="bg-blue m-8 rounded-md">
       <div className="py-8 lg:py-16 px-4 mx-auto max-w-screen-md">
         <h2 className="mb-4 text-4xl tracking-tight font-extrabold text-center text-white">Contact Us</h2>
         <p className="mb-8 lg:mb-16 font-light text-center text-white sm:text-xl">
