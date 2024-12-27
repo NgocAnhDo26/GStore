@@ -1,4 +1,3 @@
-import { findUserByEmail, createUser, comparePasswords, generateToken, changeUserPassword, findUserByUsername, decodeJwt } from './authService.js';
 import { findUserByEmail, createUser, comparePasswords, generateToken, changeUserPassword, findUserByUsername, decodeJwt,checkMailExist } from './authService.js';
 import express from 'express';
 import crypto from 'crypto';
@@ -138,6 +137,7 @@ authRouter.post("/security", async (req, res) => {
       .json({ message: "An error occurred, please try again later." });
   }
 });
+
 authRouter.post("/forgot-password", async (req, res) => {
   const { email } = req.body;
 
@@ -160,10 +160,8 @@ authRouter.post("/forgot-password", async (req, res) => {
       .json({ message: "An error occurred, please try again later." });
   }
 });
-authRouter.get("/check-exist-email", async (req, res) => {
-authRouter.get("/check-exist-email", async (req, res) => {
 
-    const { email } = req.query;
+authRouter.get("/check-exist-email", async (req, res) => {
     const { email } = req.query;
     try {
         const user = await findUserByEmail(email);
@@ -180,8 +178,7 @@ authRouter.get("/check-exist-email", async (req, res) => {
     res.status(200).json({ message: "Email is available" });
   
 });
-authRouter.get("/check-exist-username", async (req, res) => {
-    const { username } = req.query;
+
 authRouter.get("/check-exist-username", async (req, res) => {
     const { username } = req.query;
     try {
