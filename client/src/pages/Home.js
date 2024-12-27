@@ -19,18 +19,31 @@ const Home = () => {
     const [wishlisted, setWishlisted] = useState([]);
 
     useEffect(() => {
-        axios.get("https://dummyjson.com/products?limit=12").then((res) => {
-            setFeaturedGames(res.data.products);
+        // Featured games
+        axios.get("http://localhost:1111/api/product/feature-product").then((res) => {
+            setFeaturedGames(res.data);
+        }).catch((error) => {
+            console.log(error);
         });
-        
-        // // Fetch wishlist products id if user is logged in
-        // if (user) {
-        //     axios.get("http://localhost:1111/wishlist").then((res) => {
-        //         setWishlisted(res.data.products);
-        //     });
-        // } else {
-        //     setWishlisted([]);
-        // }
+
+        // Best sellers
+        axios.get("http://localhost:1111/api/product/bestseller").then((res) => {
+            setBestSellers(res.data);
+        }).catch((error) => {
+            console.log(error);
+        });
+
+        // Fetch wishlist products id if user is logged in
+        if (user) {
+            axios.get("http://localhost:1111/api/wishlist/fetch-id-from-wishlist")
+                .then((res) => {
+                    setWishlisted(res.data);
+                }).catch((error) => {
+                    console.log(error);
+                });
+        } else {
+            setWishlisted([]);
+        }
     }, []);
 
 
@@ -71,7 +84,7 @@ const Home = () => {
             <ProductSlider title="Featured Games" description="Best options to get this christmas!" products={featuredGames} />
 
             {/* Best sellers */}
-            <ProductSlider title="Best Sellers" description="Discover the best sellings from our shop!" products={featuredGames} />
+            <ProductSlider title="Best Sellers" description="Discover the best sellings from our shop!" products={bestSellers} />
         </div>
     );
 }

@@ -12,23 +12,17 @@ const Products = (props) => {
     const { user } = useAuth();
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const [keyword, setKeyword] = useState();
+    const [keyword, setKeyword] = useState(searchParams.get("keyword") || null);
     const [products, setProducts] = useState([]);
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useState(searchParams.get("page") || 1);
     const [totalPage, setTotalPage] = useState();
-    const [categoriesFilter, setCategoriesFilter] = useState([]);
-    const [priceRange, setPriceRange] = useState({});
-    const [sort, setSort] = useState("default");
+    const [categoriesFilter, setCategoriesFilter] = useState(searchParams.get("category") ? searchParams.get("category").split(",") : []);
+    const [priceRange, setPriceRange] = useState({ min: searchParams.get("minPrice"), max: searchParams.get("maxPrice") });
+    const [sort, setSort] = useState(searchParams.get("order"));
     const [wishlisted, setWishlisted] = useState([]);
 
     // Set initial filters on page load based on the URL
     useEffect(() => {
-        setKeyword(searchParams.get("keyword") || null);
-        setPage(searchParams.get("page") || null);
-        setCategoriesFilter(searchParams.get("category") ? searchParams.get("category").split(",") : []);
-        setPriceRange({ min: searchParams.get("minPrice"), max: searchParams.get("maxPrice") });
-        setSort(searchParams.get("order"));
-
         // Set sort by value for select element
         const sortSelect = document.getElementById("sort");
         if (sortSelect) {
@@ -49,10 +43,10 @@ const Products = (props) => {
     // Fetch products whenever search params change
     useEffect(() => {
         const query = searchParams.toString();
-        axios.get(`https://dummyjson.com/products?limit=10&${query}`)
+        axios.get(`http://localhost:1111/api/product?${query}`)
             .then((response) => {
                 setProducts(response.data.products);
-                setPage(response.data.currentPage);
+                // setPage(response.data.currentPage);
                 setTotalPage(response.data.totalPage);
             }).catch((error) => {
                 console.log(error);
@@ -61,11 +55,11 @@ const Products = (props) => {
 
     // Update filters and sync with URL
     useEffect(() => {
-        let query = generateQueryString(keyword, page, categoriesFilter, priceRange, sort);
+        let query = generateQueryString(keyword, page, categoriesFilter, priceRange, sort, totalPage);
         setSearchParams(query);
     }, [keyword, categoriesFilter, priceRange, sort, page]);
 
-    const generateQueryString = (keyword, page, category, priceRange, sort) => {
+    const generateQueryString = (keyword, page, category, priceRange, sort, totalPage) => {
         const params = new URLSearchParams();
 
         if (keyword) params.append('keyword', keyword);
@@ -83,7 +77,7 @@ const Products = (props) => {
 
         if (sort) params.append('order', sort);
 
-        if (page) params.append('page', page);
+        if (page && totalPage > 1) params.append('page', page);
 
         return params.toString();
     }

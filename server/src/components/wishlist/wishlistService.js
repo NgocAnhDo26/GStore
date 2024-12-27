@@ -9,7 +9,7 @@ async function addToWishlist({ userId, productId }) {
         await prisma.wishlist.create({
             data: {
                 account_id: userId,
-                product_id: parseInt(productId,10),
+                product_id: parseInt(productId, 10),
             },
         });
     } catch (error) {
@@ -23,7 +23,7 @@ async function removeFromWishlist({ userId, productId }) {
             where: {
                 account_id_product_id: {
                     account_id: userId,
-                    product_id: parseInt(productId,10),
+                    product_id: parseInt(productId, 10),
                 },
             },
         });
@@ -37,13 +37,13 @@ async function checkProductInWishlist({ userId, productId }) {
         where: {
             account_id_product_id: {
                 account_id: userId,
-                product_id: parseInt(productId,10),
+                product_id: parseInt(productId, 10),
             },
         },
     });
 }
 async function fetchproductIdFromWishlist({ userId }) {
-    const productId= await prisma.wishlist.findMany({
+    const productId = await prisma.wishlist.findMany({
         where: {
             account_id: userId,
         },
@@ -54,4 +54,4 @@ async function fetchproductIdFromWishlist({ userId }) {
     const productIds = productId.map((item) => item.product_id);
     return productIds;
 }
-export { decodeJwt, addToWishlist, removeFromWishlist, checkProductInWishlist,fetchproductIdFromWishlist };
+export { decodeJwt, addToWishlist, removeFromWishlist, checkProductInWishlist, fetchproductIdFromWishlist };

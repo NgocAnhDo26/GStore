@@ -6,9 +6,9 @@ const ProductListHorizontal = (props) => {
     
     return (
         <div className="flex flex-col gap-5 bg-gradient-to-br from-[#a26bdbbd]/80 to-[#3247d4b3]/80 p-5 self-stretch m-2 rounded-md">
-            {products.map((product) => (
+            {products !== undefined ? products.map((product) => (
                 <ProductItem key={product.id} data={product} isWishlisted={wishlisted.includes(product.id)} />
-            ))}
+            )) : <p className="text-white text-center">No products found</p>}
 
             {/* Pagination */}
             {(totalPage > 1) &&
