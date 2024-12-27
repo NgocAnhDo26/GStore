@@ -48,7 +48,7 @@ const Header = () => {
     return (
       <div className="absolute flex flex-col bg-blue1 bg-opacity-90 backdrop-blur-sm py-3 rounded-md mt-[15.5rem]">
         {categoryItems.map((item) => (
-          <Link to={item.link}>
+          <Link key={item.title} to={item.link}>
             <p className="hover:bg-btn-blue2 px-5 py-2">
               {item.title}
             </p>

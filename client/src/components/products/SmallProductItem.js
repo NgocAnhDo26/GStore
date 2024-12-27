@@ -22,7 +22,7 @@ const SmallProductItem = (props) => {
 
     return (
         <div className="flex flex-col items-center gap-2 flex-1">
-            <div class="relative h-36 w-full">
+            <div className="relative h-36 w-full">
                 <img src={product.images[0]} alt="product" className="object-cover shadow-md h-36 w-full bg-white/70 rounded-md" />
                 <button
                     className="bg-gradient-to-t from-blue1/80 to-btn-blue2/80 p-2 rounded-md text-center bottom-2 right-2 absolute hover:scale-105"

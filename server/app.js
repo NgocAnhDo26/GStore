@@ -11,7 +11,7 @@ const app = express();
 // Init middlewares
 app.use(express.urlencoded({ extended: false })); // Parse URL-encoded bodies
 app.use(express.json()); // Parse JSON bodies
-app.use(cors()); // Enable CORS
+app.use(cors({ origin: 'http://localhost:3000', credentials: true, }));
 app.use(cookieParser()); // Enable cookie parser
 app.use(passport.initialize());
 

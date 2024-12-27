@@ -1,4 +1,4 @@
-import { findUserByEmail, createUser, comparePasswords, generateToken, changeUserPassword, findUserByUsername, decodeJwt,checkMailExist } from './authService.js';
+import { findUserByEmail, createUser, comparePasswords, generateToken, changeUserPassword, findUserByUsername, decodeJwt, checkMailExist } from './authService.js';
 import express from 'express';
 import crypto from 'crypto';
 import { sendResetEmail } from './sendEmail.js';
@@ -8,8 +8,7 @@ const authRouter = express.Router();
 
 // Login route
 authRouter.post("/login", async (req, res) => {
-    const { email, password } = req.body;
-   
+  const { email, password } = req.body;
 
   if (!email || !password) {
     return res
@@ -17,42 +16,36 @@ authRouter.post("/login", async (req, res) => {
       .json({ message: "Email and password are required." });
   }
 
-  
+  try {
+    const user = await findUserByEmail(email);
+    if (!user) {
+      return res.status(401).json({ message: 'Incorrect email or password' });
+    }
+    const isMatch = await comparePasswords(password, user.password);
 
-    try {
-        const user = await findUserByEmail(email);
-        if (!user ) {
-            return res.status(401).json({ message: 'Incorrect email or password' });
-        }
-        const isMatch = await comparePasswords(password, user.password);
-
-        if (!isMatch) {
-            return res.status(401).json({ message: 'Incorrect email or password' });
-        }
-        console.log("user",user);
-
-        const token = generateToken(user);
-
-        res.cookie('authToken', token, {
-            httpOnly: true,
-            sameSite: 'Strict',
-            maxAge: 3600000,
-        });
-
-        res.status(200).json({
-            message: 'Login successful',
-            user: {
-                id: user.id,
-                email: user.email,
-                username: user.username
-            }
-        });
-    } catch (err) {
-        console.error('Login error:', err);
-        res.status(500).json({ message: 'An error occurred, please try again later.' });
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Incorrect email or password' });
     }
 
- 
+    const token = generateToken(user);
+
+    res.cookie('authToken', token, {
+      httpOnly: true,
+      sameSite: 'Strict',
+    });
+
+    res.status(200).json({
+      message: 'Login successful',
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username
+      }
+    });
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ message: 'An error occurred, please try again later.' });
+  }
 });
 
 // Register route
@@ -65,30 +58,30 @@ authRouter.post("/register", async (req, res) => {
       .json({ message: "Email and password are required." });
   }
 
-    try {
-        const checkMail = await checkMailExist(email);
-        if (!checkMail) {
-            return res.status(400).json({ message: 'Email is invalid.' });
-        }
-        const userByUsername = await findUserByUsername(username);
-
-        const user = await findUserByEmail(email);
-
-        if (userByUsername) {
-            return res.status(400).json({ message: 'Username already exists' });
-        }
-
-        if (user) {
-            return res.status(400).json({ message: 'Email already exists' });
-        }
-
-        const newUser = await createUser({ username, email, password });
-
-        res.status(200).json({ message: 'Registration successful', user: newUser });
-    } catch (err) {
-        console.error('Registration error:', err);
-        res.status(500).json({ message: 'An error occurred, please try again later.' });
+  try {
+    const checkMail = await checkMailExist(email);
+    if (!checkMail) {
+      return res.status(400).json({ message: 'Email is invalid.' });
     }
+    const userByUsername = await findUserByUsername(username);
+
+    const user = await findUserByEmail(email);
+
+    if (userByUsername) {
+      return res.status(400).json({ message: 'Username already exists' });
+    }
+
+    if (user) {
+      return res.status(400).json({ message: 'Email already exists' });
+    }
+
+    const newUser = await createUser({ username, email, password });
+
+    res.status(200).json({ message: 'Registration successful', user: newUser });
+  } catch (err) {
+    console.error('Registration error:', err);
+    res.status(500).json({ message: 'An error occurred, please try again later.' });
+  }
 });
 
 // Logout route
@@ -162,39 +155,31 @@ authRouter.post("/forgot-password", async (req, res) => {
 });
 
 authRouter.get("/check-exist-email", async (req, res) => {
-    const { email } = req.query;
-    try {
-        const user = await findUserByEmail(email);
-        if (user) {
-            return res.status(200).json(true);
-            return res.status(200).json(true);
-        }
-        res.status(200).json(false);
-        res.status(200).json(false);
-    } catch (error) {
-        console.error('Error:', error);
-        res.status(500).json({ message: 'An error occurred, please try again later.' });
+  const { email } = req.query;
+  try {
+    const user = await findUserByEmail(email);
+    if (user) {
+      return res.status(200).json(true);
     }
-    res.status(200).json({ message: "Email is available" });
-  
+    res.status(200).json(false);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ message: 'An error occurred, please try again later.' });
+  }
 });
 
 authRouter.get("/check-exist-username", async (req, res) => {
-    const { username } = req.query;
-    try {
-        const user = await findUserByUsername(username);
-        if (user) {
-            return res.status(200).json(true);
-            return res.status(200).json(true);
-        }
-        res.status(200).json(false);
-        res.status(200).json(false);
-    } catch (error) {
-        console.error('Error:', error);
-        res.status(500).json({ message: 'An error occurred, please try again later.' });
+  const { username } = req.query;
+  try {
+    const user = await findUserByUsername(username);
+    if (user) {
+      return res.status(200).json(true);
     }
-    res.status(200).json({ message: "Username is available" });
-  
+    res.status(200).json(false);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ message: 'An error occurred, please try again later.' });
+  }
 });
 
 export default authRouter;
