@@ -56,7 +56,7 @@ const Table = ({ columns, rows }) => {
                       className="h-48 w-96 rounded-md object-cover"
                     />
                   ) : col.id === "actions" ? (
-                    <div className="flex flex-col">
+                    <div className="flex flex-row gap-2">
                       {row[col.id].map((action, actionIndex) => (
                         <a
                           key={actionIndex}
