@@ -32,11 +32,13 @@ async function decodeJwt(token) {
   return jwt.verify(token, process.env.JWT_SECRET_KEY);
 }
 
-async function checkoutService({ accountId }) {
+async function checkoutService({ accountId, paymentMethodId }) {
   await prisma.$transaction(async (prisma) => {
+
     const order = await prisma.orders.create({
       data: {
         account_id: parseInt(accountId, 10),
+        payment_method_id: parseInt(paymentMethodId, 10),
         status: 'Pending',
       },
     });
@@ -62,7 +64,6 @@ async function checkoutService({ accountId }) {
     const keysToSend = [];
 
     for (const item of cartItems) {
-      
       for (let i = 0; i < item.quantity; i++) {
         const keyGame = await prisma.key_game.findFirst({
           where: {
@@ -75,13 +76,11 @@ async function checkoutService({ accountId }) {
           throw new Error(`No available key for product id ${item.product_id}`);
         }
 
-       
         const product = await prisma.product.findUnique({
           where: { id: item.product_id },
           select: { name: true },
         });
 
-      
         await prisma.key_game.update({
           where: { id: keyGame.id },
           data: { is_used: true },
@@ -90,10 +89,9 @@ async function checkoutService({ accountId }) {
         keysToSend.push({
           product_id: item.product_id,
           key_code: keyGame.key_code,
-          product_name: product.name,  
+          product_name: product.name,
         });
 
-       
         await prisma.product.update({
           where: { id: item.product_id },
           data: { in_stock: { decrement: 1 } },
@@ -114,7 +112,7 @@ async function checkoutService({ accountId }) {
     const email = emailRecord.email;
 
     await sendKeyGame(keysToSend, email);
-    
+
     await prisma.orders.update({
       where: { id: order.id },
       data: { status: 'Completed' },
@@ -123,6 +121,35 @@ async function checkoutService({ accountId }) {
     return { order };
   }, { timeout: 10000 });
 }
+async function  getCartItems({accountId}) {
+  const cartItems = await prisma.cart.findMany({
+    where: { account_id: parseInt(accountId, 10) },
+    include: {
+      product: {
+        select: { name: true, price: true },
+      },
+    },
+  });
 
+  const paymentMethods = await prisma.payment_methods.findMany({
+    select: { id: true, method_name: true },
+  });
 
-export { decodeJwt, checkoutService };
+  const totalAmount = cartItems.reduce(
+    (total, item) => total + item.product.price * item.quantity,
+    0
+  );
+
+  return {
+    cartItems: cartItems.map((item) => ({
+      product_id: item.product_id,
+      name: item.product.name,
+      quantity: item.quantity,
+      price: item.product.price,
+    })),
+    paymentMethods,
+    totalAmount,
+  };
+}
+
+export { decodeJwt, checkoutService, getCartItems };
