@@ -117,6 +117,10 @@ authRouter.post("/security", async (req, res) => {
       return res.status(401).json({ message: "Old password is incorrect" });
     }
 
+    if(oldPassword === newPassword) {
+      return res.status(400).json({ message: "New password must be different from old password." });
+    }
+
     await changeUserPassword(userId, newPassword);
 
     res.status(200).json({ message: "Password changed successfully" });
