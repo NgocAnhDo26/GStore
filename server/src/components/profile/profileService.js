@@ -57,7 +57,7 @@ async function fetchGameCollectionWithQuery(account_id, query) {
     // Pagination setup
     const page = Number(query.page) || 1; 
     const limit = Number(query.limit) || 10; 
-    const offset = (page - 1) * limit; 
+    const offset = (page - 1) * limit;
 
     // Keyword filter (optional)
     const keywordFilters = [];
@@ -84,18 +84,20 @@ async function fetchGameCollectionWithQuery(account_id, query) {
         order_product: {
           where: keywordFilters.length > 0 ? { OR: keywordFilters } : undefined,
           include: {
-            product: true,  // Include product data
+            product: true, // Include product data
           },
         },
       },
-      skip: offset, 
-      take: limit,  
+      skip: offset,
+      take: limit,
     });
+
+    // Flatten and filter duplicates
     const filteredGames = gameCollection.flatMap(order =>
       order.order_product
         .filter(orderProduct => {
           const productCreateTime = new Date(orderProduct.product.create_time);
-          
+
           // Apply date filtering if either from or to is provided
           if (query.from && query.to) {
             return productCreateTime >= new Date(query.from) && productCreateTime <= new Date(query.to);
@@ -104,12 +106,16 @@ async function fetchGameCollectionWithQuery(account_id, query) {
           } else if (query.to) {
             return productCreateTime <= new Date(query.to); // Filter if only to is provided
           }
-          
-          return true; 
+
+          return true;
         })
         .map(orderProduct => orderProduct.product)
     );
-    
+
+    // Remove duplicates based on product ID
+    const uniqueGames = Array.from(
+      new Map(filteredGames.map(game => [game.id, game])).values()
+    );
 
     const totalCount = await prisma.orders.count({
       where: orderFilter,
@@ -119,7 +125,7 @@ async function fetchGameCollectionWithQuery(account_id, query) {
     const totalPage = Math.ceil(totalCount / limit);
 
     return {
-      games: filteredGames,
+      games: uniqueGames,
       currentPage: page,
       totalPage: totalPage,
     };
@@ -128,6 +134,7 @@ async function fetchGameCollectionWithQuery(account_id, query) {
     throw new Error("Failed to fetch game collection.");
   }
 }
+
 
 
   
@@ -159,6 +166,9 @@ async function fetchHistoryWithQuery(account_id, query) {
   let limit = Number(query.limit) || 10;
   let offset = (page - 1) * limit;
 
+  if (query.id) {
+    filters.id = Number(query.id);
+  }
   // Filter by time range
   if (query.from || query.to) {
     filters.create_time = {
@@ -175,13 +185,6 @@ async function fetchHistoryWithQuery(account_id, query) {
         include: {
           product: true,
         },
-        where: query.id
-          ? {
-              product: {
-                id: Number(query.id),
-              },
-            }
-          : undefined, // Only apply filter if query.id exists
       },
     },
   });
@@ -216,7 +219,6 @@ async function fetchHistoryWithQuery(account_id, query) {
     })
     .filter((order) => {
       // Apply min and max filters
-      console.log(query.min)
       if (query.min && order.total_price < Number(query.min)) {
         return false;
       }
