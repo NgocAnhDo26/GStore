@@ -53,6 +53,10 @@ const PurchaseHistory = () => {
       }));
       setTableRow(rows);
     }
+    else
+    {
+      setTableRow([])
+    }
   }, [historyData]);
   
   return (

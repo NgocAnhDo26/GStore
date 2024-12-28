@@ -47,6 +47,10 @@ const GameCollection = () => {
       }));
       setTableRow(rows); 
     }
+    else
+    {
+      setTableRow([])
+    }
   }, [collectionData]);
 
   return (
