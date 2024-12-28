@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 
-const Filter = ({ columns }) => {
+const Filter = ({ columns, query, setQuery }) => {
   const [filterQuery, setFilterQuery] = useState(
     columns.reduce((acc, col) => {
       acc[col.id] = "";
       return acc;
-    }, {}),
+    }, {})
   );
 
   const handleBlur = (id, value) => {
@@ -15,6 +15,12 @@ const Filter = ({ columns }) => {
     }));
     console.log(`Column: ${id}, Filter value: ${value}`);
     console.log(filterQuery);
+
+    // Update the query object
+    setQuery((prevQuery) => ({
+      ...prevQuery,
+      [id]: value,
+    }));
   };
 
   return (

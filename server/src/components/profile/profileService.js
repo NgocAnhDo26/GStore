@@ -51,7 +51,7 @@ async function fetchGameCollectionWithQuery(account_id, query) {
       // Base filter for orders
       const orderFilter = {
         account_id,
-        status: "ok", // Filter by status 'ok'
+        status: "completed",
       };
   
       // Pagination setup
@@ -142,64 +142,67 @@ async function fetchGameCollection(account_id) {
 }
 
 async function fetchHistoryWithQuery(account_id, query) {
-    let filters = { account_id: account_id, status: 'ok' }; // Default filter to include account and status
-    let page = Number(query.page) || 1;
-    let limit = Number(query.limit) || 10;
-    let offset = (page - 1) * limit;
-  
-    // Filter by ID (assuming partial match for ID)
-    if (query.id) {
-      filters.id = { contains: query.id }; // Adjust based on your database schema
-    }
-  
-    // Filter by minimum and maximum total price
-    if (query.min || query.max) {
-      filters.total_price = {
-        gte: query.min ? Number(query.min) : 0,
-        lte: query.max ? Number(query.max) : Number.MAX_SAFE_INTEGER,
-      };
-    }
-  
-    // Filter by time range
-    if (query.from || query.to) {
-      filters.created_at = {
-        gte: query.from ? new Date(query.from) : undefined,
-        lte: query.to ? new Date(query.to) : undefined,
-      };
-    }
-  
-    // Fetch orders and related products
-    const history = await prisma.orders.findMany({
-      where: filters,
-      include: {
-        order_product: {
-          include: {
-            product: true, // Assuming the `order_product` table has a relation to the `product` table
-          },
+  let filters = { account_id: account_id }; // Default filter to include account
+  let page = Number(query.page) || 1;
+  let limit = Number(query.limit) || 10;
+  let offset = (page - 1) * limit;
+
+  // Filter by time range
+  if (query.from || query.to) {
+    filters.created_at = {
+      gte: query.from ? new Date(query.from) : undefined,
+      lte: query.to ? new Date(query.to) : undefined,
+    };
+  }
+
+  // Fetch orders and related products
+  const history = await prisma.orders.findMany({
+    where: filters,
+    include: {
+      order_product: {
+        include: {
+          product: true, // Assuming the order_product table has a relation to the product table
         },
+        where: query.id
+          ? {
+              product: {
+                id : Number(query.id), // Partial match for product_id
+              },
+            }
+          : undefined, // Only apply filter if query.id exists
       },
-    });
-  
-    // Pagination logic
-    const paginatedHistory = history.slice(offset, offset + limit);
-    const totalPage = Math.ceil(history.length / limit);
-  
-    // Map the data to include order details and product IDs
-    const mappedHistory = paginatedHistory.map((order) => ({
+    },
+  });
+
+  // Calculate total price dynamically and map results
+  const calculatedHistory = history.map((order) => {
+    const total_price = order.order_product.reduce((sum, op) => {
+      return sum + (op.product.price * op.quantity);
+    }, 0);
+
+    return {
       order_id: order.id,
-      total_price: order.total_price,
-      created_at: order.created_at,
+      total_price: total_price, // Dynamically calculated total price
+      created_at: order.create_time,
+      status: order.status,
       products: order.order_product.map((op) => ({
         product_id: op.product_id,
-        product_name: op.product.name, // Assuming `product` has a `name` column
+        product_name: op.product.name,
+        product_price: op.product.price,
+        quantity: op.quantity,
       })),
-    }));
-  
-    return {
-      history: mappedHistory,
-      totalPage: totalPage,
-      currentPage: page,
     };
+  });
+
+  // Pagination logic
+  const paginatedHistory = calculatedHistory.slice(offset, offset + limit);
+  const totalPage = Math.ceil(calculatedHistory.length / limit);
+
+  return {
+    history: paginatedHistory,
+    totalPage: totalPage,
+    currentPage: page,
+  };
 }
   
   
