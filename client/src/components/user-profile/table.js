@@ -58,13 +58,23 @@ const Table = ({ columns, rows }) => {
                   ) : col.id === "actions" ? (
                     <div className="flex flex-row gap-2">
                       {row[col.id].map((action, actionIndex) => (
-                        <a
-                          key={actionIndex}
-                          href={action.link}
-                          className={`font-medium hover:underline ${action.color || 'text-blue-600'}`}
-                        >
-                          {action.label}
-                        </a>
+                        action.type === "button" ? (
+                          <button
+                            key={actionIndex}
+                            onClick={action.onClick}
+                            className={`font-medium ${action.color || 'bg-blue-600'} text-white py-2 px-4 rounded`}
+                          >
+                            {action.label}
+                          </button>
+                        ) : (
+                          <a
+                            key={actionIndex}
+                            href={action.link}
+                            className={`font-medium hover:underline ${action.color || 'text-blue-600'}`}
+                          >
+                            {action.label}
+                          </a>
+                        )
                       ))}
                     </div>
                   ) : (
