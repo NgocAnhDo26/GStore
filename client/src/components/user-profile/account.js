@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../../hooks/AuthProvider";
+import Swal from "sweetalert2";
 
 const Account = () => {
 
@@ -38,13 +39,14 @@ const Account = () => {
     axios
       .post(
         "http://localhost:1111/api/profile/info",
-        formData, // Data to be sent in the request body
-        { withCredentials: true } // Config options, such as credentials, as the third argument
+        formData,
+        { withCredentials: true }
       )
       .then((res) => {
         console.log("Form Data Submitted:", formData);
         console.log("Response Data:", res.data);
-        
+        setAccountData(res.data)
+        Swal.fire("Profile updated successfully!");
       })
       .catch((error) => {
         console.log("Error:", error.response?.data || error.message);
@@ -66,12 +68,16 @@ const Account = () => {
           <div className="text-xs text-gray-500">{accountData.email}</div>
         </div>
         <div className="flex-grow">
+          <div>Phone Number</div>
+          <div className="text-xs text-gray-500">{accountData.phone}</div>
+        </div>
+        <div className="flex-grow">
           <div>Birthdate</div>
-          <div className="text-xs text-gray-500">{accountData.birthdate}</div>
+          <div className="text-xs text-gray-500">{accountData?.birthdate?.split('T')[0] || "N/A"}</div>
         </div>
         <div className="flex-grow">
           <div>Starting Day</div>
-          <div className="text-xs text-gray-500">{accountData.create_time}</div>
+          <div className="text-xs text-gray-500">{accountData?.create_time?.split('T')[0] || "N/A"}</div>
         </div>
       </div>
 
@@ -82,7 +88,7 @@ const Account = () => {
           name="name"
           value={formData.name}
           onChange={handleFormChange}
-          placeholder={accountData.username}
+          placeholder='Username'
           className="mb-4 w-1/2 rounded-lg border p-2"
         />
         <input
@@ -90,7 +96,7 @@ const Account = () => {
           name="birthdate"
           value={formData.birthdate}
           onChange={handleFormChange}
-          placeholder={accountData.birthdate}
+          placeholder='Birthdate'
           className="mb-4 w-1/2 rounded-lg border p-2"
         />
         <input
@@ -98,7 +104,7 @@ const Account = () => {
           name="phone"
           value={formData.phone}
           onChange={handleFormChange}
-          placeholder={accountData.phone}
+          placeholder='Phone Number'
           className="mb-4 w-1/2 rounded-lg border p-2"
         />
         <button
