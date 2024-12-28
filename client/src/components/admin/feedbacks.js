@@ -7,7 +7,7 @@ const Feedbacks = () => {
         { id: "1", label: "Email", width: "10%" },
         { id: "2", label: "Username", width: "10%" },
         { id: "3", label: "Content", width: "40%" },
-        { id: "4", label: "Subject", width: "20%" },
+        { id: "4", label: "Subject", width: "20%" ,sort: true},
         { id: "actions", label: "Detail" },
     ];
 

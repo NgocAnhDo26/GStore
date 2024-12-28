@@ -53,7 +53,7 @@ const Table = ({ columns, rows }) => {
                     <img
                       src={row[col.id]}
                       alt={col.label}
-                      className="h-48 w-96 rounded-md object-cover"
+                      className="h-48 w-96 rounded-md object-contain"
                     />
                   ) : col.id === "actions" ? (
                     <div className="flex flex-row gap-2">
