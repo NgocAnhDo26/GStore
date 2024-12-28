@@ -47,77 +47,88 @@ async function updateAccountByID(accountID, updateFields) {
 
 
 async function fetchGameCollectionWithQuery(account_id, query) {
-    try {
-      // Base filter for orders
-      const orderFilter = {
-        account_id,
-        status: "ok", // Filter by status 'ok'
+  try {
+    const orderFilter = {
+      account_id,
+      status: "Completed", 
+    };
+
+    // Pagination setup
+    const page = Number(query.page) || 1; 
+    const limit = Number(query.limit) || 10; 
+    const offset = (page - 1) * limit; 
+
+    // Keyword filter (optional)
+    const keywordFilters = [];
+    if (query.keyword) {
+      keywordFilters.push({
+        product: {
+          name: { contains: query.keyword },
+        },
+      });
+    }
+
+    // Date range filter for order creation (optional)
+    if (query.from && query.to) {
+      orderFilter.create_time = {
+        gte: new Date(query.from), 
+        lte: new Date(query.to),   
       };
-  
-      // Pagination setup
-      const page = Number(query.page) || 1; // Default to page 1 if not provided
-      const limit = Number(query.limit) || 10; // Default to 10 items per page if not provided
-      const offset = (page - 1) * limit; // Calculate the offset for pagination
-  
-      // Keyword filter (optional)
-      const keywordFilters = [];
-      if (query.keyword) {
-        keywordFilters.push({
-          product: {
-            name: { contains: query.keyword },
-          },
-        });
-      }
-  
-      // Date range filter (optional)
-      if (query.from && query.to) {
-        orderFilter.create_time = {
-          gte: new Date(query.from), // Greater than or equal to 'from' date
-          lte: new Date(query.to),   // Less than or equal to 'to' date
-        };
-      }
-  
-      // Query orders and related order_products with pagination
-      const gameCollection = await prisma.orders.findMany({
-        where: orderFilter,
-        include: {
-          order_product: {
-            include: {
-              product: true, // Assuming a relation to the product table for game details
-            },
-            where: keywordFilters.length > 0 ? { OR: keywordFilters } : undefined,
+    }
+
+    // Query orders and related order_products with pagination
+    const gameCollection = await prisma.orders.findMany({
+      where: orderFilter,
+      include: {
+        order_product: {
+          where: keywordFilters.length > 0 ? { OR: keywordFilters } : undefined,
+          include: {
+            product: true,  // Include product data
           },
         },
-        skip: offset, // Skip records for pagination
-        take: limit,  // Limit the number of records per page
-      });
-  
-      // Fetch total count for pagination calculation
-      const totalCount = await prisma.orders.count({
-        where: orderFilter,
-      });
-  
-      // Flatten the results to extract game information
-      const games = gameCollection.flatMap(order =>
-        order.order_product.map(orderProduct => orderProduct.product)
-      );
-  
-      // Calculate total pages
-      const totalPage = Math.ceil(totalCount / limit);
-  
-      return {
-        games,
-        currentPage: page,
-        totalPage: totalPage,
-      };
-    } catch (error) {
-      console.error("Error fetching game collection:", error);
-      throw new Error("Failed to fetch game collection.");
-    }
+      },
+      skip: offset, 
+      take: limit,  
+    });
+    const filteredGames = gameCollection.flatMap(order =>
+      order.order_product
+        .filter(orderProduct => {
+          const productCreateTime = new Date(orderProduct.product.create_time);
+          
+          // Apply date filtering if either `from` or `to` is provided
+          if (query.from && query.to) {
+            return productCreateTime >= new Date(query.from) && productCreateTime <= new Date(query.to);
+          } else if (query.from) {
+            return productCreateTime >= new Date(query.from); // Filter if only `from` is provided
+          } else if (query.to) {
+            return productCreateTime <= new Date(query.to); // Filter if only `to` is provided
+          }
+          
+          return true; 
+        })
+        .map(orderProduct => orderProduct.product)
+    );
+    
+
+    const totalCount = await prisma.orders.count({
+      where: orderFilter,
+    });
+
+    // Calculate total pages
+    const totalPage = Math.ceil(totalCount / limit);
+
+    return {
+      games: filteredGames,
+      currentPage: page,
+      totalPage: totalPage,
+    };
+  } catch (error) {
+    console.error("Error fetching game collection:", error);
+    throw new Error("Failed to fetch game collection.");
   }
-  
-  
-  
+}
+
+
   
 async function fetchGameCollection(account_id) {
     const collection = await prisma.product.findMany({
@@ -142,67 +153,78 @@ async function fetchGameCollection(account_id) {
 }
 
 async function fetchHistoryWithQuery(account_id, query) {
-    let filters = { account_id: account_id, status: 'ok' }; // Default filter to include account and status
-    let page = Number(query.page) || 1;
-    let limit = Number(query.limit) || 10;
-    let offset = (page - 1) * limit;
-  
-    // Filter by ID (assuming partial match for ID)
-    if (query.id) {
-      filters.id = { contains: query.id }; // Adjust based on your database schema
-    }
-  
-    // Filter by minimum and maximum total price
-    if (query.min || query.max) {
-      filters.total_price = {
-        gte: query.min ? Number(query.min) : 0,
-        lte: query.max ? Number(query.max) : Number.MAX_SAFE_INTEGER,
-      };
-    }
-  
-    // Filter by time range
-    if (query.from || query.to) {
-      filters.created_at = {
-        gte: query.from ? new Date(query.from) : undefined,
-        lte: query.to ? new Date(query.to) : undefined,
-      };
-    }
-  
-    // Fetch orders and related products
-    const history = await prisma.orders.findMany({
-      where: filters,
-      include: {
-        order_product: {
-          include: {
-            product: true, // Assuming the `order_product` table has a relation to the `product` table
-          },
+  let filters = { account_id: account_id };
+  let page = Number(query.page) || 1;
+  let limit = Number(query.limit) || 10;
+  let offset = (page - 1) * limit;
+
+  // Filter by time range
+  if (query.from || query.to) {
+    filters.create_time = {
+      gte: query.from ? new Date(query.from) : undefined,
+      lte: query.to ? new Date(query.to) : undefined,
+    };
+  }
+
+  // Fetch orders and related products
+  const history = await prisma.orders.findMany({
+    where: filters,
+    include: {
+      order_product: {
+        include: {
+          product: true, 
         },
+        where: query.id
+          ? {
+              product: {
+                id: Number(query.id), 
+              },
+            }
+          : undefined, // Only apply filter if query.id exists
       },
-    });
+    },
+  });
+
   
-    // Pagination logic
-    const paginatedHistory = history.slice(offset, offset + limit);
-    const totalPage = Math.ceil(history.length / limit);
-  
-    // Map the data to include order details and product IDs
-    const mappedHistory = paginatedHistory.map((order) => ({
-      order_id: order.id,
-      total_price: order.total_price,
-      created_at: order.created_at,
-      products: order.order_product.map((op) => ({
-        product_id: op.product_id,
-        product_name: op.product.name, // Assuming `product` has a `name` column
-      })),
-    }));
-  
+  if (!history.some(order => order.order_product.length > 0)) {
     return {
-      history: mappedHistory,
-      totalPage: totalPage,
+      history: [],
+      totalPage: 0,
       currentPage: page,
     };
+  }
+
+  // Calculate total price dynamically and map results
+  const calculatedHistory = history.map((order) => {
+    const total_price = order.order_product.reduce((sum, op) => {
+      return sum + (op.product.price * op.quantity);
+    }, 0);
+
+    return {
+      order_id: order.id,
+      total_price: total_price, 
+      created_at: order.create_time,
+      status: order.status,
+      products: order.order_product.map((op) => ({
+        product_id: op.product_id,
+        product_name: op.product.name,
+        product_price: op.product.price,
+        quantity: op.quantity,
+      })),
+    };
+  });
+
+  // Pagination logic
+  const paginatedHistory = calculatedHistory.slice(offset, offset + limit);
+  const totalPage = Math.ceil(calculatedHistory.length / limit);
+
+  return {
+    history: paginatedHistory,
+    totalPage: totalPage,
+    currentPage: page,
+  };
 }
-  
-  
+
 async function fetchPurchaseHistory(accountId) {
     return prisma.orders.findMany({
         where: {
@@ -242,110 +264,142 @@ async function fetchPurchaseHistory(accountId) {
 }
 
 async function fetchUserReviewWithQuery(account_id, query) {
-    const filters = {
-        account_id: account_id,
+  const filters = {
+    account_id: account_id,
+  };
+
+  // Filter by content
+  if (query.content) {
+    filters.content = {
+      contains: query.content, 
+      mode: 'insensitive', 
     };
+  }
 
-    // Filter by content
-    if (query.content) {
-        filters.content = {
-        contains: query.content, // Assumes a partial match on content
-        mode: 'insensitive', // Case insensitive search
-        };
-    }
-
-    // Filter by product name (game name)
-    if (query.game_name) {
-        filters.product = {
-        name: {
-            contains: query.game_name, // Partial match on game name
-            mode: 'insensitive', // Case insensitive search
-        },
-        };
-    }
-
-    // Filter by rating
-    if (query.rating) {
-        filters.rating = {
-        gte: Number(query.rating), // Assuming an exact match for rating
-        };
-    }
-
-    // Filter by date range (from, to)
-    if (query.from || query.to) {
-        filters.create_time = {
-        gte: query.from ? new Date(query.from) : undefined,
-        lte: query.to ? new Date(query.to) : undefined,
-        };
-    }
-
-    try {
-        // Fetch reviews with the filters applied
-        const reviews = await prisma.product_review.findMany({
-        where: filters,
-        include: {
-            product: true, // Include product details (game name, etc.)
-        },
-        });
-
-        return reviews;
-    } catch (error) {
-        console.error('Error fetching reviews:', error);
-        throw new Error('Failed to fetch reviews');
-    }
-}
-
-async function fetchWishlistWithQuery(account_id, query) {
-    let filters = {
-      account_id: account_id,  // Filter by account_id (user)
+  // Filter by rating
+  if (query.rating) {
+    filters.rating = {
+      gte: Number(query.rating), 
     };
-  
-    let page = Number(query.page) || 1;  // Default page is 1
-    let limit = Number(query.limit) || 10;  // Default limit is 10 items per page
-    let offset = (page - 1) * limit;  // Pagination offset
-  
-    // Filter by product name (partial match)
-    if (query.keyword) {
-      filters.product = {
-        name: {
-          contains: query.keyword,  // Perform partial match on product name
-          mode: 'insensitive',  // Case-insensitive search
-        },
-      };
-    }
-  
-    // Filter by date range (from-to)
-    if (query.from || query.to) {
-      filters.created_at = {
-        gte: query.from ? new Date(query.from) : undefined,  // From date
-        lte: query.to ? new Date(query.to) : undefined,  // To date
-      };
-    }
-  
-    try {
-      // Fetch wishlist items with the given filters and include related product details
-      const wishlistItems = await prisma.wishlist.findMany({
-        where: filters,
-        include: {
-          product: true,  // Include related product data (name, price, etc.)
-        },
-      });
-  
-      // Pagination logic
-      let paginatedWishlist = wishlistItems.slice(offset, offset + limit);
-      let totalPage = Math.ceil(wishlistItems.length / limit);
-  
+  }
+
+  // Filter by date range (from, to)
+  if (query.from || query.to) {
+    filters.create_time = {
+      gte: query.from ? new Date(query.from) : undefined,
+      lte: query.to ? new Date(query.to) : undefined,
+    };
+  }
+
+  // Pagination logic
+  let page = Number(query.page) || 1;  
+  let limit = Number(query.limit) || 10;  
+  let offset = (page - 1) * limit;  
+
+  try {
+    
+    const reviews = await prisma.product_review.findMany({
+      where: filters,
+      include: {
+        product: true, 
+      },
+    });
+
+    // Filter reviews by game name (if provided) after fetching the data
+    const filteredReviews = query.name
+      ? reviews.filter((review) =>
+          review.product.name.toLowerCase().includes(query.name.toLowerCase())
+        )
+      : reviews;
+
+    // Pagination and empty history handling
+    const paginatedReviews = filteredReviews.slice(offset, offset + limit);
+    const totalPage = Math.ceil(filteredReviews.length / limit);
+
+    if (filteredReviews.length === 0) {
       return {
-        wishlist: paginatedWishlist,
-        totalPage: totalPage,
+        review: [],
+        totalPage: 0,
         currentPage: page,
       };
-    } catch (error) {
-      console.error('Error fetching wishlist:', error);
+    }
+
+    return {
+      review: paginatedReviews,
+      totalPage: totalPage,
+      currentPage: page,
+    };
+  } catch (error) {
+    console.error('Error fetching reviews:', error);
+    throw new Error('Failed to fetch reviews');
+  }
+}
+
+
+
+async function fetchWishlistWithQuery(account_id, query) {
+  let filters = {
+    account_id: account_id,  // Filter by account_id (user)
+  };
+
+  let page = Number(query.page) || 1;  
+  let limit = Number(query.limit) || 10;  
+  let offset = (page - 1) * limit;  
+
+  // Filter by product name (partial match in the product table)
+  let productFilters = {};
+  if (query.name) {
+    productFilters.name = {
+      contains: query.name,  
+    };
+  }
+
+  // Filter by date range (from-to)
+  if (query.from || query.to) {
+    filters.created_time = {
+      gte: query.from ? new Date(query.from) : undefined,  
+      lte: query.to ? new Date(query.to) : undefined,  
+    };
+  }
+
+  try {
+    // Fetch wishlist items with the given filters and include related product details
+    const wishlistItems = await prisma.wishlist.findMany({
+      where: {
+        ...filters,
+        product: productFilters,  
+      },
+      include: {
+        product: true,  
+      },
+    });
+
+    if (wishlistItems.length === 0) {
       return {
-        error: 'Failed to fetch wishlist',
+        wishlist: [],
+        totalPage: 0,
+        currentPage: page,
       };
     }
+
+    let paginatedWishlist = wishlistItems.slice(offset, offset + limit);
+    let totalPage = Math.ceil(wishlistItems.length / limit);
+
+    // Return the wishlist with create_time included in the response
+    return {
+      wishlist: paginatedWishlist.map(item => ({
+        ...item,
+        create_time: item.created_time,  // Include create_time in the response
+      })),
+      totalPage: totalPage,
+      currentPage: page,
+    };
+  } catch (error) {
+    console.error('Error fetching wishlist:', error);
+    return {
+      error: 'Failed to fetch wishlist',
+    };
+  }
 }
 
 async function decodeJwt(token) {
