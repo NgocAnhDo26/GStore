@@ -9,6 +9,7 @@ async function fetchAccountByID(accountID) {
         select: {
             id: true,
             username: true,
+            phone:true,
             email: true,
             address: true,
             birthdate: true,
@@ -95,13 +96,13 @@ async function fetchGameCollectionWithQuery(account_id, query) {
         .filter(orderProduct => {
           const productCreateTime = new Date(orderProduct.product.create_time);
           
-          // Apply date filtering if either `from` or `to` is provided
+          // Apply date filtering if either from or to is provided
           if (query.from && query.to) {
             return productCreateTime >= new Date(query.from) && productCreateTime <= new Date(query.to);
           } else if (query.from) {
-            return productCreateTime >= new Date(query.from); // Filter if only `from` is provided
+            return productCreateTime >= new Date(query.from); // Filter if only from is provided
           } else if (query.to) {
-            return productCreateTime <= new Date(query.to); // Filter if only `to` is provided
+            return productCreateTime <= new Date(query.to); // Filter if only to is provided
           }
           
           return true; 
@@ -172,12 +173,12 @@ async function fetchHistoryWithQuery(account_id, query) {
     include: {
       order_product: {
         include: {
-          product: true, 
+          product: true,
         },
         where: query.id
           ? {
               product: {
-                id: Number(query.id), 
+                id: Number(query.id),
               },
             }
           : undefined, // Only apply filter if query.id exists
@@ -185,8 +186,7 @@ async function fetchHistoryWithQuery(account_id, query) {
     },
   });
 
-  
-  if (!history.some(order => order.order_product.length > 0)) {
+  if (!history.some((order) => order.order_product.length > 0)) {
     return {
       history: [],
       totalPage: 0,
@@ -194,29 +194,41 @@ async function fetchHistoryWithQuery(account_id, query) {
     };
   }
 
-  // Calculate total price dynamically and map results
-  const calculatedHistory = history.map((order) => {
-    const total_price = order.order_product.reduce((sum, op) => {
-      return sum + (op.product.price * op.quantity);
-    }, 0);
+  // Calculate total price dynamically and apply min and max filters
+  const filteredHistory = history
+    .map((order) => {
+      const total_price = order.order_product.reduce((sum, op) => {
+        return sum + op.product.price * op.quantity;
+      }, 0);
 
-    return {
-      order_id: order.id,
-      total_price: total_price, 
-      created_at: order.create_time,
-      status: order.status,
-      products: order.order_product.map((op) => ({
-        product_id: op.product_id,
-        product_name: op.product.name,
-        product_price: op.product.price,
-        quantity: op.quantity,
-      })),
-    };
-  });
+      return {
+        order_id: order.id,
+        total_price: total_price,
+        created_at: order.create_time,
+        status: order.status,
+        products: order.order_product.map((op) => ({
+          product_id: op.product_id,
+          product_name: op.product.name,
+          product_price: op.product.price,
+          quantity: op.quantity,
+        })),
+      };
+    })
+    .filter((order) => {
+      // Apply min and max filters
+      console.log(query.min)
+      if (query.min && order.total_price < Number(query.min)) {
+        return false;
+      }
+      if (query.max && order.total_price > Number(query.max)) {
+        return false;
+      }
+      return true;
+    });
 
   // Pagination logic
-  const paginatedHistory = calculatedHistory.slice(offset, offset + limit);
-  const totalPage = Math.ceil(calculatedHistory.length / limit);
+  const paginatedHistory = filteredHistory.slice(offset, offset + limit);
+  const totalPage = Math.ceil(filteredHistory.length / limit);
 
   return {
     history: paginatedHistory,
@@ -224,6 +236,7 @@ async function fetchHistoryWithQuery(account_id, query) {
     currentPage: page,
   };
 }
+
 
 async function fetchPurchaseHistory(accountId) {
     return prisma.orders.findMany({
@@ -272,7 +285,6 @@ async function fetchUserReviewWithQuery(account_id, query) {
   if (query.content) {
     filters.content = {
       contains: query.content, 
-      mode: 'insensitive', 
     };
   }
 
