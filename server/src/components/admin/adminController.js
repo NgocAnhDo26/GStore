@@ -43,7 +43,7 @@ router.put("/", upload.array("images"), (req, res) => {
 // View game sales analysis
 router.get("/sale", (req, res) => {
   service
-    .viewGameSales(req.body)
+    .viewGameSales(req.query)
     .then((result) => res.status(200).json(result))
     .catch((err) => {
       console.error(`View game sale:`, err);
