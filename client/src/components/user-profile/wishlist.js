@@ -5,14 +5,16 @@ import axios from "axios";
 
 const MyWishlist = () => {
   const columns = [
-    { id: "1", label: "Game Name", width: "30%" },
-    { id: "2", label: "Description", width: "40%" },
-    { id: "3", label: "Price Sale", width: "20%" ,sort:true},
-    { id: "actions", label: "Detail" },
+    { id: "1", label: "Image", width: "30%", type: 'image' },
+    { id: "2", label: "Game Name", width: "30%" },
+    { id: "3", label: "Price Sale", width: "20%", sort: true },
+    { id: "4", label: "Actions", width: "20%" },
   ];
 
   const filterColumns = [
     { id: "name", label: "Game Name", width: "60%" },
+    { id: "min", label: "Min", width: "20%" },
+    { id: "max", label: "Max", width: "20%" },
   ];
 
   const [query, setQuery] = useState({});
@@ -39,9 +41,9 @@ const MyWishlist = () => {
   useEffect(() => {
     if (wishlistData.length > 0) {
       const rows = wishlistData.map((item) => ({
-        1: item.product.name,
-        2: item.product.description,
-        3: item.product.price_sale,
+        1: item.product_profile_image.url,
+        2: item.product_name,
+        3: item.product_price_sale,
         actions: [{ label: "View", link: `product/${item.product_id}` }],
       }));
       setTableRow(rows);
