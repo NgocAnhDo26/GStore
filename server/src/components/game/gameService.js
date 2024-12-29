@@ -24,7 +24,7 @@ export async function fetchProductWithQuery(query) {
   }
 
   if (query.category) {
-    const categoriesKeywords = query.category.split("-");
+    const categoriesKeywords = query.category.split(",");
     filters.AND.push({
       AND: categoriesKeywords.map((name) => ({
         category_product: {
