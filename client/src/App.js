@@ -16,6 +16,7 @@ import Admin from "./pages/admin";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import PrivateRoute from "./routes/route";
 import ShoppingCart from "./pages/ShoppingCart";
+import ProductInfo from "./pages/ProductInfo";
 
 function App() {
   return (
@@ -27,10 +28,13 @@ function App() {
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />
               <Route path="/home" element={<Home />} />
-              <Route path="/admin" element={<Admin />} />
               <Route element={<GuestGuard />}>
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+              </Route>
+              <Route path="/products">
+                <Route index element={<Products />} />
+                <Route path=":id" element={<ProductInfo />} />
               </Route>
               <Route path="/products" element={<Products />} />
               <Route path="/cart" element={<ShoppingCart />} />
