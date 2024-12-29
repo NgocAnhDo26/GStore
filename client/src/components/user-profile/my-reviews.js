@@ -7,7 +7,8 @@ const MyReviews = () => {
   const columns = [
     { id: "1", label: "Time", width: "15%", sort: true },
     { id: "2", label: "Game Name", width: "30%" },
-    { id: "3", label: "Content", width: "55%" },
+    { id: "3", label: "Rating", width: "10%" },
+    { id: "4", label: "Content", width: "55%" },
     { id: "actions", label: "Detail" },
   ];
 
@@ -43,8 +44,9 @@ const MyReviews = () => {
       const rows = reviewData.map((review) => ({
         1: new Date(review.create_time).toLocaleDateString(), 
         2: review.product.name,
-        3: review.content, 
-        actions: [{ label: "View", link: `#/${review.product_id}` }], 
+        3: review.rating,
+        4: review.content, 
+        actions: [{ label: "View", link: `products/${review.product_id}` }], 
       }));
       setTableRow(rows); 
     } else {
