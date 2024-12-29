@@ -29,15 +29,28 @@ async function addReview({ userId, productId, rating, content }) {
                 rating: true,
                 content: true,
                 create_time: true,
+                account: {  
+                    select: {
+                        username: true,    
+                    },
+                },
             },
         });
 
-        return review;
+        return {
+            product_id: review.product_id,
+            account_id: review.account_id,
+            rating: review.rating,
+            content: review.content,
+            create_time: review.create_time,
+            username: review.account.username, 
+        };
     } catch (error) {
         console.error("Error adding review:", error);
         throw new Error('Error adding review');
     }
 }
+
 
 async function decodeJwt(token) {
     return jwt.verify(token, process.env.JWT_SECRET_KEY);
