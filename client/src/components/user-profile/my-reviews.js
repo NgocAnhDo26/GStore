@@ -46,7 +46,7 @@ const MyReviews = () => {
         2: review.product.name,
         3: review.rating,
         4: review.content, 
-        actions: [{ label: "View", link: `products/${review.product_id}` }], 
+        actions: [{ label: "View", link: `product/${review.product_id}` }], 
       }));
       setTableRow(rows); 
     } else {
