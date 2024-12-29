@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";  // Import useParams
 import Sidebar from "../components/user-profile/sidebar";
 import Account from "../components/user-profile/account";
 import PurchaseHistory from "../components/user-profile/purchase-history";
@@ -8,7 +9,16 @@ import Wishlist from "../components/user-profile/wishlist";
 import Security from "../components/user-profile/security";
 
 const UserProfile = () => {
+  // Get the section from the URL parameters
+  const { section } = useParams();
   const [activeSection, setActiveSection] = useState("account");
+
+  // Update activeSection when URL changes
+  useEffect(() => {
+    if (section) {
+      setActiveSection(section);
+    }
+  }, [section]);
 
   const renderSection = () => {
     switch (activeSection) {

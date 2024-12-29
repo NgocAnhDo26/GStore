@@ -115,7 +115,7 @@ const Header = () => {
 
         {/* Login/Account button */}
         <div onMouseEnter={openProfileDropdown} onMouseLeave={closeProfileDropdown} className="flex flex-row items-center gap-5">
-          <Link to={auth.user ? "/profile" : "/login"} className="border-2 py-1.5 px-3 flex flex-row items-center rounded-md max-h-fit h-fit ml-5 hover:scale-105 hover:bg-white hover:bg-opacity-20 transition duration-300">
+          <Link to={auth.user ? "/profile/account" : "/login"} className="border-2 py-1.5 px-3 flex flex-row items-center rounded-md max-h-fit h-fit ml-5 hover:scale-105 hover:bg-white hover:bg-opacity-20 transition duration-300">
             <IconContext.Provider value={{ color: "white" }}>
               <FaRegUser />
             </IconContext.Provider>
