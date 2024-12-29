@@ -25,7 +25,7 @@ userRouter.post("/", async (req, res) => {
         }
 
         const review = await addReview({ userId: decoded._id, productId, rating, content });
-        res.status(200).json({ message: 'Review added successfully' ,review});
+        res.status(200).json({ message: 'Review added successfully', review});
     } catch (err) {
         console.error('Add review error:', err);
         res.status(500).json({ message: 'An error occurred, please try again later.' });

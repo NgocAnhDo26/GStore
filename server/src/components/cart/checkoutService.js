@@ -1,6 +1,8 @@
 import { prisma } from '../../config/config.js';
 import jwt from 'jsonwebtoken';
 import sgMail from "@sendgrid/mail";
+import { getImage } from "../util/util.js";
+
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 async function sendKeyGame(keysToSend, email) {
@@ -121,12 +123,19 @@ async function checkoutService({ accountId, paymentMethodId }) {
     return { order };
   }, { timeout: 10000 });
 }
-async function  getCartItems({accountId}) {
+async function getCartItems({ accountId }) {
   const cartItems = await prisma.cart.findMany({
     where: { account_id: parseInt(accountId, 10) },
     include: {
       product: {
-        select: { name: true, price: true },
+        select: {
+          name: true,
+          price: true,
+          product_image: {
+            where: { is_profile_img: true },
+            select: { public_id: true },
+          },
+        },
       },
     },
   });
@@ -140,16 +149,19 @@ async function  getCartItems({accountId}) {
     0
   );
 
+
   return {
     cartItems: cartItems.map((item) => ({
       product_id: item.product_id,
       name: item.product.name,
       quantity: item.quantity,
       price: item.product.price,
+      image_url: getImage(item.product.product_image[0]?.public_id).url || null, 
     })),
     paymentMethods,
     totalAmount,
   };
 }
+
 
 export { decodeJwt, checkoutService, getCartItems };

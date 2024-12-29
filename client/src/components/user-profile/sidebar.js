@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom"; // Import Link for navigation
 import {
   FaUser,
   FaCartShopping,
@@ -31,9 +32,9 @@ const Sidebar = ({ activeSection, onSectionChange }) => {
   return (
     <div className="flex h-full w-60 flex-col gap-4 rounded-xl border-solid bg-white p-4">
       {sidebarItems.map((item) => (
-        <button
+        <Link
           key={item.id}
-          onClick={() => onSectionChange(item.section)}
+          to={`/profile/${item.section}`}  // Use Link to update the URL
           className={`flex items-center justify-start space-x-2 rounded-2xl border-solid px-4 py-2 text-white transition duration-300 ${
             activeSection === item.section ? "bg-gray-700" : "bg-custom-dark2"
           }`}
@@ -42,7 +43,7 @@ const Sidebar = ({ activeSection, onSectionChange }) => {
             <div className="text-xl">{item.image}</div>
           </div>
           <div>{item.label}</div>
-        </button>
+        </Link>
       ))}
     </div>
   );

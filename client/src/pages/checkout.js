@@ -122,13 +122,20 @@ const Checkout = () => {
                                             key={item.product_id}
                                             className="flex justify-between items-center py-4"
                                         >
-                                            <div>
-                                                <h4 className="font-bold text-gray-800">
-                                                    {item.name}
-                                                </h4>
-                                                <p className="text-sm text-gray-600">
-                                                    Quantity: {item.quantity}
-                                                </p>
+                                            <div className="flex items-center">
+                                                <img
+                                                    src={item.image_url}
+                                                    alt={item.name}
+                                                    className="w-48 h-16 object-contain mr-4"
+                                                />
+                                                <div>
+                                                    <h4 className="font-bold text-gray-800">
+                                                        {item.name}
+                                                    </h4>
+                                                    <p className="text-sm text-gray-600">
+                                                        Quantity: {item.quantity}
+                                                    </p>
+                                                </div>
                                             </div>
                                             <div className="text-right">
                                                 <p className="font-bold text-gray-800">

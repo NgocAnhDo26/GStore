@@ -10,7 +10,6 @@ const PurchaseHistory = () => {
     { id: "3", label: "Game Name", width: "25%" },
     { id: "4", label: "Total", width: "20%", sort: true },
     { id: "5", label: "Status", width: "20%", sort: true },
-    { id: "actions", label: "Detail" },
   ];
 
   const filterColumns = [

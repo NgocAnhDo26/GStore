@@ -1,23 +1,21 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useAuth } from "../../hooks/AuthProvider";
 import Swal from "sweetalert2";
 
 const Account = () => {
-
   const [accountData, setAccountData] = useState([]);
 
   useEffect(() => {
-    axios.get("http://localhost:1111/api/profile/info",
-      { withCredentials: true })
-      .then(res => {
+    axios
+      .get("http://localhost:1111/api/profile/info", { withCredentials: true })
+      .then((res) => {
         setAccountData(res.data);
-        console.log(res.data)
+        console.log(res.data);
       })
-      .catch(error => {
-        console.log('Error: ', error.response?.data || error.message);
-      })
-  }, [])
+      .catch((error) => {
+        console.log("Error: ", error.response?.data || error.message);
+      });
+  }, []);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -33,27 +31,27 @@ const Account = () => {
     }));
   };
 
-
   const useChangeData = (e) => {
     e.preventDefault();
     axios
-      .post(
-        "http://localhost:1111/api/profile/info",
-        formData,
-        { withCredentials: true }
-      )
+      .post("http://localhost:1111/api/profile/info", formData, {
+        withCredentials: true,
+      })
       .then((res) => {
         console.log("Form Data Submitted:", formData);
         console.log("Response Data:", res.data);
-        setAccountData(res.data)
+        setAccountData(res.data); 
+
+        const updatedUser = JSON.parse(localStorage.getItem("user"));
+        updatedUser.username = res.data.username; 
+        localStorage.setItem("user", JSON.stringify(updatedUser)); 
+
         Swal.fire("Profile updated successfully!");
       })
       .catch((error) => {
         console.log("Error:", error.response?.data || error.message);
       });
   };
-  
-
 
   return (
     <div className="flex flex-col gap-6 rounded-xl bg-white p-8">
@@ -73,11 +71,15 @@ const Account = () => {
         </div>
         <div className="flex-grow">
           <div>Birthdate</div>
-          <div className="text-xs text-gray-500">{accountData?.birthdate?.split('T')[0] || "N/A"}</div>
+          <div className="text-xs text-gray-500">
+            {accountData?.birthdate?.split("T")[0] || "N/A"}
+          </div>
         </div>
         <div className="flex-grow">
           <div>Starting Day</div>
-          <div className="text-xs text-gray-500">{accountData?.create_time?.split('T')[0] || "N/A"}</div>
+          <div className="text-xs text-gray-500">
+            {accountData?.create_time?.split("T")[0] || "N/A"}
+          </div>
         </div>
       </div>
 
@@ -88,7 +90,7 @@ const Account = () => {
           name="name"
           value={formData.name}
           onChange={handleFormChange}
-          placeholder='Username'
+          placeholder="Username"
           className="mb-4 w-1/2 rounded-lg border p-2"
         />
         <input
@@ -96,7 +98,7 @@ const Account = () => {
           name="birthdate"
           value={formData.birthdate}
           onChange={handleFormChange}
-          placeholder='Birthdate'
+          placeholder="Birthdate"
           className="mb-4 w-1/2 rounded-lg border p-2"
         />
         <input
@@ -104,7 +106,7 @@ const Account = () => {
           name="phone"
           value={formData.phone}
           onChange={handleFormChange}
-          placeholder='Phone Number'
+          placeholder="Phone Number"
           className="mb-4 w-1/2 rounded-lg border p-2"
         />
         <button

@@ -40,7 +40,7 @@ function App() {
               <Route path="/cart" element={<ShoppingCart />} />
               <Route path="/customer-service" element={<SupportPage />} />
               <Route element={<PrivateRoute />}>
-                <Route path="/profile" element={<UserProfile />} />
+                <Route path="/profile/:section" element={<UserProfile />} />
                 <Route path="/checkout" element={<Checkout />} />
               </Route>
               <Route path="*" element={<div class="flex-1"></div>} />

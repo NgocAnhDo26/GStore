@@ -68,7 +68,7 @@ const Header = () => {
   const ProfileDropDown = () => {
     return (
       <div className="absolute flex flex-col bg-blue1 bg-opacity-90 backdrop-blur-sm py-3 rounded-md mt-36 ml-5 text-white">
-        <Link to="/profile" className="hover:bg-btn-blue2 px-5 py-2">
+        <Link to="/profile/account" className="hover:bg-btn-blue2 px-5 py-2">
           Your Profile
         </Link>
         <button className="hover:bg-btn-blue2 px-5 py-2 text-left" onClick={closeProfileDropdown && auth.handleLogout}>
@@ -115,7 +115,7 @@ const Header = () => {
 
         {/* Login/Account button */}
         <div onMouseEnter={openProfileDropdown} onMouseLeave={closeProfileDropdown} className="flex flex-row items-center gap-5">
-          <Link to={auth.user ? "/profile" : "/login"} className="border-2 py-1.5 px-3 flex flex-row items-center rounded-md max-h-fit h-fit ml-5 hover:scale-105 hover:bg-white hover:bg-opacity-20 transition duration-300">
+          <Link to={auth.user ? "/profile/account" : "/login"} className="border-2 py-1.5 px-3 flex flex-row items-center rounded-md max-h-fit h-fit ml-5 hover:scale-105 hover:bg-white hover:bg-opacity-20 transition duration-300">
             <IconContext.Provider value={{ color: "white" }}>
               <FaRegUser />
             </IconContext.Provider>
