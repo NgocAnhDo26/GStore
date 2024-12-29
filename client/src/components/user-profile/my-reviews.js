@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Table from "./table";
 import Filter from "./filter";
+import axios from "axios";
 
 const MyReviews = () => {
   const columns = [
@@ -16,32 +17,50 @@ const MyReviews = () => {
     { id: "to", label: "To", type: "date", width: "20%" },
   ];
 
-  const rows = [
-    {
-      1: "01/01/2025",
-      2: "LOL",
-      3: "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quasi ipsum numquam officia nihil minima hic mollitia saepe quia cupiditate? Doloribus et odit at? Dolorum, ratione modi? Quidem excepturi placeat itaque?",
-      actions: [{ label: "View", link: "#" }],
-    },
-    {
-      1: "02/01/2025",
-      2: "DOTA",
-      3: "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quasi ipsum numquam officia nihil minima hic mollitia saepe quia cupiditate? Doloribus et odit at? Dolorum, ratione modi? Quidem excepturi placeat itaque?",
-      actions: [{ label: "View", link: "#" }],
-    },
-    {
-      1: "03/01/2025",
-      2: "TFT",
-      3: "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quasi ipsum numquam officia nihil minima hic mollitia saepe quia cupiditate? Doloribus et odit at? Dolorum, ratione modi? Quidem excepturi placeat itaque?",
-      actions: [{ label: "View", link: "#" }],
-    },
-  ];
+  const [query, setQuery] = useState({});
+  const [reviewData, setReviewData] = useState([]);
+  const [tableRow, setTableRow] = useState([]);
+
+  useEffect(() => {
+    console.log("Query updated:", query);
+    axios
+      .get("http://localhost:1111/api/profile/review", {
+        params: query,
+        withCredentials: true,
+      })
+      .then((res) => {
+        console.log("API Response:", res.data);
+        setReviewData(res.data.review || []); 
+      })
+      .catch((error) => {
+        console.error("Error:", error.response?.data || error.message);
+        setReviewData([]); 
+      });
+  }, [query]);
+
+  useEffect(() => {
+    if (reviewData.length > 0) {
+      const rows = reviewData.map((review) => ({
+        1: new Date(review.create_time).toLocaleDateString(), 
+        2: review.product.name,
+        3: review.content, 
+        actions: [{ label: "View", link: `#/${review.product_id}` }], 
+      }));
+      setTableRow(rows); 
+    } else {
+      setTableRow([]); 
+    }
+  }, [reviewData]);
 
   return (
     <div className="flex flex-col gap-6 rounded-xl border-solid bg-white p-8">
       <div className="border-b text-2xl font-bold">My Reviews</div>
-      <Filter columns={filterColumns} />
-      <Table columns={columns} rows={rows} />
+      <Filter columns={filterColumns} query={query} setQuery={setQuery} />
+      {tableRow.length > 0 ? (
+        <Table key={JSON.stringify(tableRow)} columns={columns} rows={tableRow} />
+      ) : (
+        <p>No data available.</p>
+      )}
     </div>
   );
 };
