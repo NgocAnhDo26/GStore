@@ -64,3 +64,14 @@ export const addGameKey = async (productId, keyCode) => {
     throw error;
   }
 };
+export const checkExistGameKey = async (keyCode) => {
+  try {
+    const existingKey = await prisma.key_game.findFirst({
+      where: { key_code: keyCode },
+    });
+    return existingKey;
+  } catch (error) {
+    console.error("Error checking existing game key:", error);
+    throw error;
+  }
+}

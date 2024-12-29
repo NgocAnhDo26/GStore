@@ -20,6 +20,11 @@ router.post("/", async (req, res) => {
   }
 
   try {
+    
+    const existingKey = await service.checkExistGameKey(keyCode);
+    if (existingKey) {
+      return res.status(400).json({ message: "Game key already exists" });
+    }
     const newKey = await service.addGameKey(productId, keyCode);
     return res.status(201).json({
       message: "Game key added successfully",
