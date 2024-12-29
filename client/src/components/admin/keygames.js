@@ -2,41 +2,42 @@ import React, { useEffect, useState } from "react";
 import Table from "../user-profile/table";
 import axios from "axios";
 
-const Feedbacks = () => {
+const KeyGames = () => {
     const columns = [
-        { id: "1", label: "Email", width: "10%" },
-        { id: "2", label: "Username", width: "10%" },
-        { id: "3", label: "Content", width: "40%" },
-        { id: "4", label: "Subject", width: "20%" ,sort: true},
+        { id: "1", label: "Id", width: "10%", sort: true },
+        { id: "2", label: "Game Name", width: "40%" },
+        { id: "3", label: "In stock", width: "20%", sort: true },
+        { id: "4", label: "Keys", width: "40%" },
         { id: "actions", label: "Detail" },
     ];
 
-    const subjectMapping = {
-        1: "General",
-        2: "Complaint",
-        3: "Support",
-        4: "Suggestion",
-    };
-
     const [rows, setRows] = useState([]);
     const [isFormVisible, setIsFormVisible] = useState(false);
-    const [response, setResponse] = useState([]);
-    const [selectedFeedback, setSelectedFeedback] = useState(null);
+    const [response, setResponse] = useState("");
+    const [selectedGame, setSelectedGame] = useState(null);
 
-    useEffect(() => {
-        axios.get("http://localhost:1111/admin/feedback", { withCredentials: true })
+    const fetchGameKeys = () => {
+        axios.get("http://localhost:1111/admin/game-key", { withCredentials: true })
             .then((res) => {
-                const feedbackData = res.data.feedback;
+                const response = res.data;
+                console.log(response);
 
-                const formattedRows = feedbackData.map((item, index) => ({
-                    1: item.email,
-                    2: item.username,
-                    3: item.content,
-                    4: subjectMapping[item.type_id] || "Unknown",
+                const formattedRows = response.map((item) => ({
+                    1: item.id,
+                    2: item.name,
+                    3: item.in_stock,
+                    4: item.keys.map((key) => (
+                        <span
+                            key={key.id}
+                            className={`block ${key.is_used ? "text-red-500" : "text-green-500"}`}
+                        >
+                            {key.key_code}
+                        </span>
+                    )),
                     actions: [
                         {
                             type: "button",
-                            label: "Send",
+                            label: "Add",
                             onClick: () => openForm(item)
                         },
                     ],
@@ -47,45 +48,46 @@ const Feedbacks = () => {
             .catch((error) => {
                 console.error(error);
             });
-    }, []);
-
-
-    const openForm = (feedback) => {
-        setSelectedFeedback(feedback);
-        setIsFormVisible(true);
     };
 
+    useEffect(() => {
+        fetchGameKeys();
+    }, []);
+
+    const openForm = (Game) => {
+        setSelectedGame(Game);
+        setIsFormVisible(true);
+    };
 
     const closeForm = () => {
         setIsFormVisible(false);
         setResponse("");
-        setSelectedFeedback(null);
+        setSelectedGame(null);
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log("Sending response for feedback:", selectedFeedback);
+        console.log("Sending response:", selectedGame);
         console.log("Response:", response);
 
-        axios.post("http://localhost:1111/admin/feedback",
-            {
-                email: selectedFeedback.email,
-                content: response,
-            }
-            , { withCredentials: true })
+        axios.post("http://localhost:1111/admin/game-key", {
+            productId: selectedGame.id,
+            keyCode: response,
+        }, { withCredentials: true })
             .then((res) => {
-
-                console.log("Data:", res.data)
+                console.log("Data:", res.data);
+                fetchGameKeys();
             })
             .catch((error) => {
                 console.error(error);
             });
+
         closeForm();
     };
 
     return (
         <div className="flex flex-col gap-6 rounded-xl border-solid bg-white p-8">
-            <div className="border-b text-2xl font-bold">Feedbacks</div>
+            <div className="border-b text-2xl font-bold">Keygames</div>
             {rows.length > 0 ? (
                 <Table key={JSON.stringify(rows)} columns={columns} rows={rows} />
             ) : (
@@ -95,11 +97,11 @@ const Feedbacks = () => {
             {isFormVisible && (
                 <div className="fixed inset-0 flex justify-center items-center bg-gray-600 bg-opacity-50 z-10">
                     <div className="bg-white p-8 rounded-lg shadow-lg w-1/3 z-20">
-                        <h2 className="text-xl font-bold mb-4">Send Response</h2>
+                        <h2 className="text-xl font-bold mb-4">Add key game</h2>
                         <form onSubmit={handleSubmit}>
                             <div className="mb-4">
                                 <label htmlFor="response" className="block text-sm font-medium text-gray-700">
-                                    Response
+                                    Key
                                 </label>
                                 <input
                                     type="text"
@@ -130,4 +132,4 @@ const Feedbacks = () => {
     );
 };
 
-export default Feedbacks;
+export default KeyGames;

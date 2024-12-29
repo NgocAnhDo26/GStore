@@ -84,14 +84,17 @@ model order_product {
 }
 
 model orders {
-  id            Int             @id @default(autoincrement())
-  account_id    Int
-  create_time   DateTime        @default(now()) @db.Timestamp(0)
-  status        String          @db.VarChar(20)
-  order_product order_product[]
-  account       account         @relation(fields: [account_id], references: [id], onDelete: Cascade, map: "orders_ibfk_1")
+  id                Int              @id @default(autoincrement())
+  account_id        Int
+  payment_method_id Int?
+  create_time       DateTime         @default(now()) @db.Timestamp(0)
+  status            String           @db.VarChar(20)
+  order_product     order_product[]
+  account           account          @relation(fields: [account_id], references: [id], onDelete: Cascade, map: "orders_ibfk_1")
+  payment_methods   payment_methods? @relation(fields: [payment_method_id], references: [id], map: "orders_ibfk_2")
 
   @@index([account_id], map: "account_id")
+  @@index([payment_method_id], map: "payment_method_id")
 }
 
 model product {
@@ -165,4 +168,10 @@ model key_game {
   product     product  @relation(fields: [product_id], references: [id], onDelete: Cascade, map: "fk_key_game_product")
 
   @@index([product_id], map: "idx_product")
+}
+
+model payment_methods {
+  id          Int      @id @default(autoincrement())
+  method_name String   @db.VarChar(50)
+  orders      orders[]
 }

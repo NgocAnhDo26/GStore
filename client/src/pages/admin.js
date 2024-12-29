@@ -3,10 +3,10 @@ import AdminSidebar from "../components/admin/admin-sidebar";
 import Dashboard from "../components/admin/dashboard";
 import Users from "../components/admin/users";
 import Products from "../components/admin/products";
-import Orders from "../components/admin/orders";
+import KeyGames from "../components/admin/keygames";
 import Feedbacks from "../components/admin/feedbacks";
 
-const Admin = () =>{
+const Admin = () => {
     const [activeSection, setActiveSection] = useState("dashboard");
 
     const renderSection = () => {
@@ -16,26 +16,26 @@ const Admin = () =>{
             case "users":
                 return <Users />;
             case "products":
-                return <Products/>;
-            case "orders":
-                return <Orders/>;
+                return <Products />;
+            case "keygames":
+                return <KeyGames />;
             case "feedbacks":
-                return <Feedbacks/>;        
+                return <Feedbacks />;
             default:
                 return <Dashboard />;
         }
-      };
+    };
 
-    return(
-        
+    return (
+
         <>
-        <AdminSidebar
-        activeSection={activeSection}
-        onSectionChange={setActiveSection} />
+            <AdminSidebar
+                activeSection={activeSection}
+                onSectionChange={setActiveSection} />
 
-        <div class="p-4 sm:ml-64">
-        {renderSection()}
-        </div>
+            <div class="p-4 sm:ml-64">
+                {renderSection()}
+            </div>
         </>
     );
 };

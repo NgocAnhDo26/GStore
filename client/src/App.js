@@ -23,6 +23,7 @@ function App() {
       <AuthProvider>
         <CartProvider>
           <Routes>
+            <Route path="/admin" element={<Admin />} />
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />
               <Route path="/home" element={<Home />} />
