@@ -349,42 +349,28 @@ async function fetchUserReviewWithQuery(account_id, query) {
   }
 }
 
-
-
 async function fetchWishlistWithQuery(account_id, query) {
   let filters = {
-    account_id: account_id,  // Filter by account_id (user)
+    account_id: account_id, // Filter by account_id (user)
   };
 
-  let page = Number(query.page) || 1;  
-  let limit = Number(query.limit) || 10;  
-  let offset = (page - 1) * limit;  
+  let page = Number(query.page) || 1;
+  let limit = Number(query.limit) || 10;
+  let offset = (page - 1) * limit;
 
-  // Filter by product name (partial match in the product table)
-  let productFilters = {};
+  // Add filters for product name (partial match)
   if (query.name) {
-    productFilters.name = {
-      contains: query.name,  
-    };
-  }
-
-  // Filter by date range (from-to)
-  if (query.from || query.to) {
-    filters.created_time = {
-      gte: query.from ? new Date(query.from) : undefined,  
-      lte: query.to ? new Date(query.to) : undefined,  
+    filters.product = {
+      name: { contains: query.name },
     };
   }
 
   try {
-    // Fetch wishlist items with the given filters and include related product details
+    // Fetch wishlist items with filters
     const wishlistItems = await prisma.wishlist.findMany({
-      where: {
-        ...filters,
-        product: productFilters,  
-      },
+      where: filters,
       include: {
-        product: true,  
+        product: true, // Include product data (id, name, price, price_sale)
       },
     });
 
@@ -396,22 +382,56 @@ async function fetchWishlistWithQuery(account_id, query) {
       };
     }
 
-    let paginatedWishlist = wishlistItems.slice(offset, offset + limit);
-    let totalPage = Math.ceil(wishlistItems.length / limit);
+    // Apply price filtering (considering price_sale if available)
+    const filteredWishlist = wishlistItems.filter((item) => {
+      const price = item.product.price_sale ?? item.product.price; // Use price_sale if it exists, otherwise price
+      if (query.min && price < Number(query.min)) return false;
+      if (query.max && price > Number(query.max)) return false;
+      return true;
+    });
 
-    // Return the wishlist with create_time included in the response
+    // Fetch profile images for all products in the filtered wishlist
+    const productIds = filteredWishlist.map((item) => item.product.id);
+    const profileImages = await prisma.product_image.findMany({
+      where: {
+        product_id: { in: productIds },
+        is_profile_img: true,
+      },
+      select: {
+        product_id: true,
+        public_id: true,
+      },
+    });
+
+    // Map profile images to their respective products
+    const imageMap = profileImages.reduce((map, image) => {
+      map[image.product_id] = image.public_id;
+      return map;
+    }, {});
+
+    // Map filtered wishlist items to include profile image and price logic
+    const paginatedWishlist = filteredWishlist.slice(offset, offset + limit).map((item) => ({
+      wishlist_id: item.id,
+      account_id: item.account_id,
+      product_id: item.product.id,
+      product_name: item.product.name,
+      product_price: item.product.price,
+      product_price_sale: item.product.price_sale || null,
+      product_profile_image: imageMap[item.product.id] || null, // Add profile image or null
+      create_time: item.created_time,
+    }));
+
+    const totalPage = Math.ceil(filteredWishlist.length / limit);
+
     return {
-      wishlist: paginatedWishlist.map(item => ({
-        ...item,
-        create_time: item.created_time,  // Include create_time in the response
-      })),
+      wishlist: paginatedWishlist,
       totalPage: totalPage,
       currentPage: page,
     };
   } catch (error) {
-    console.error('Error fetching wishlist:', error);
+    console.error("Error fetching wishlist:", error);
     return {
-      error: 'Failed to fetch wishlist',
+      error: "Failed to fetch wishlist",
     };
   }
 }
