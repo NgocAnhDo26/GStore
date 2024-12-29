@@ -1,18 +1,16 @@
 import React, { lazy, Suspense, useEffect, useState } from "react";
 import axios from "axios";
 import Filters from "../components/products/filters";
+import ProductListHorizontal from "../components/products/ProductListHorizontal";
 import Home from "./Home";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "../hooks/AuthProvider";
 
-
-const ProductListHorizontal = lazy(() => import("../components/products/ProductListHorizontal"));
-
-const Products = (props) => {
+const Products = () => {
     const { user } = useAuth();
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const [keyword, setKeyword] = useState(searchParams.get("keyword") || null);
+    const [keyword] = useState(searchParams.get("keyword") || null);
     const [products, setProducts] = useState([]);
     const [page, setPage] = useState(searchParams.get("page") || 1);
     const [totalPage, setTotalPage] = useState();
@@ -29,14 +27,17 @@ const Products = (props) => {
             sortSelect.value = searchParams.get("order") || "default";
         }
 
-        // // Fetch wishlist products id if user is logged in
-        // if (user) {
-        //     axios.get("http://localhost:1111/api/wishlist").then((res) => {
-        //         setWishlisted(res.data.products);
-        //     });
-        // } else {
-        //     setWishlisted([]);
-        // }
+        // Fetch wishlist products id if user is logged in
+        if (user !== null) {
+            axios.get("http://localhost:1111/api/wishlist/fetch-id-from-wishlist", { withCredentials: true })
+                .then((res) => {
+                    setWishlisted(res.data.wishlist);
+                }).catch((error) => {
+                    console.log(error);
+                });
+        } else {
+            setWishlisted([]);
+        }
 
     }, []);
 
@@ -96,9 +97,7 @@ const Products = (props) => {
                         <option value="price-desc" className="text-black">Price: High to Low</option>
                     </select>
                 </div>
-                <Suspense fallback={<Home />}>
-                    <ProductListHorizontal products={products} page={page} setPage={setPage} totalPage={totalPage} wishlisted={wishlisted} />
-                </Suspense>
+                <ProductListHorizontal products={products} page={page} setPage={setPage} totalPage={totalPage} wishlisted={wishlisted} />
             </div>
         </div>
     );

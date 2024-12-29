@@ -12,38 +12,42 @@ import 'swiper/css/navigation';
 import 'swiper/css/autoplay';
 
 const Home = () => {
-    const { user } = useAuth();
-
     const [featuredGames, setFeaturedGames] = useState([]);
     const [bestSellers, setBestSellers] = useState([]);
     const [wishlisted, setWishlisted] = useState([]);
 
+    const { user, handleLogout } = useAuth();
+
     useEffect(() => {
-        // Featured games
-        axios.get("http://localhost:1111/api/product/feature-product").then((res) => {
-            setFeaturedGames(res.data);
-        }).catch((error) => {
-            console.log(error);
-        });
+        const fetchData = () => {
+            axios.get("http://localhost:1111/api/product/feature-product").then((response) => {
+                setFeaturedGames(response.data);
+            }).catch((error) => {
+                console.log(error);
+            });
 
-        // Best sellers
-        axios.get("http://localhost:1111/api/product/bestseller").then((res) => {
-            setBestSellers(res.data);
-        }).catch((error) => {
-            console.log(error);
-        });
+            axios.get("http://localhost:1111/api/product/bestseller").then((response) => {
+                setBestSellers(response.data);
+            }).catch((error) => {
+                console.log(error);
+            });
 
-        // Fetch wishlist products id if user is logged in
-        if (user) {
-            axios.get("http://localhost:1111/api/wishlist/fetch-id-from-wishlist")
-                .then((res) => {
-                    setWishlisted(res.data);
-                }).catch((error) => {
-                    console.log(error);
-                });
-        } else {
-            setWishlisted([]);
+            if (user !== null) {
+                axios.get("http://localhost:1111/api/wishlist/fetch-id-from-wishlist",
+                    { withCredentials: true }).then((response) => {
+                        setWishlisted(response.data.wishlist);
+                    }).catch((error) => {
+                        if (error.response.status === 401) {
+                            handleLogout();
+                        }
+                        console.log(error);
+                    });
+            } else {
+                setWishlisted([]);
+            }
         }
+
+        fetchData();
     }, []);
 
 
@@ -81,10 +85,10 @@ const Home = () => {
             </div>
 
             {/* Featured games */}
-            <ProductSlider title="Featured Games" description="Best options to get this christmas!" products={featuredGames} />
+            <ProductSlider title="Featured Games" description="Best options to get this christmas!" products={featuredGames} wishlisted={{ wishlisted, setWishlisted }} />
 
             {/* Best sellers */}
-            <ProductSlider title="Best Sellers" description="Discover the best sellings from our shop!" products={bestSellers} />
+            <ProductSlider title="Best Sellers" description="Discover the best sellings from our shop!" products={bestSellers} wishlisted={{ wishlisted, setWishlisted }} />
         </div>
     );
 }

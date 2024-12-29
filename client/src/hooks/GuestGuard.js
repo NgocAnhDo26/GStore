@@ -3,9 +3,9 @@ import { useAuth } from "./AuthProvider";
 import { Navigate, Outlet } from "react-router-dom";
 
 const GuestGuard = ({ children }) => {
-    const auth = useAuth();
+    const { user } = useAuth();
 
-    if (auth.user) {
+    if (user !== null) {
         return <Navigate to="/" />;
     }
 

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Swal from "sweetalert2";
 import { useAuth } from "../hooks/AuthProvider";
+import { useCart } from "../hooks/CartProvider";
 
 import { IconContext } from "react-icons";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
@@ -8,6 +9,7 @@ import { Link } from "react-router-dom";
 
 const Login = () => {
     const auth = useAuth();
+    const { mergeCart } = useCart();
 
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [isEmailCorrect, setIsEmailCorrect] = useState(true);
@@ -23,7 +25,7 @@ const Login = () => {
         setIsPasswordVisible(!isPasswordVisible);
     }
 
-    function onLoginEvent(e) {
+    async function onLoginEvent(e) {
         e.preventDefault();
 
         if (!isEmailCorrect) {
@@ -39,7 +41,7 @@ const Login = () => {
             return;
         }
 
-        auth.handleLogin({ email, password });
+        auth.handleLogin({ email, password });    
     }
 
     return (

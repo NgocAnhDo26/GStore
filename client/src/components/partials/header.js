@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/AuthProvider";
+import { useCart } from "../../hooks/CartProvider";
 
 import { IconContext } from "react-icons";
 import { FaRegUser, FaRegHeart, FaMagnifyingGlass } from "react-icons/fa6";
@@ -9,11 +10,17 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 
 const Header = () => {
   const auth = useAuth();
+  const { cart } = useCart();
   const navigate = useNavigate();
 
   const [keyword, setKeyword] = useState("");
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
+
+  useEffect(() => {
+    setCartCount(cart.length);
+  }, [cart]);
 
   const openCategoryDropDown = () => {
     setIsCategoryOpen(true);
@@ -103,7 +110,7 @@ const Header = () => {
           <IconContext.Provider value={{ color: "white" }}>
             <FiShoppingCart />
           </IconContext.Provider>
-          <p className="text-white ml-3">Cart (1)</p>
+          <p className="text-white ml-3">Cart {(cartCount !== 0) && `(${cartCount})`}</p>
         </Link>
 
         {/* Login/Account button */}
