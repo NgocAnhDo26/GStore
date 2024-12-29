@@ -56,7 +56,7 @@ const Table = ({ columns, rows }) => {
                       className="h-48 w-96 rounded-md object-contain"
                     />
                   ) : col.id === "actions" ? (
-                    <div className="flex flex-row gap-2 justify-center items-center">
+                    <div className="flex flex-row gap-2  items-center">
                       {row[col.id].map((action, actionIndex) => (
                         action.type === "button" ? (
                           <button

@@ -8,7 +8,7 @@ const MyWishlist = () => {
     { id: "1", label: "Image", width: "30%", type: 'image' },
     { id: "2", label: "Game Name", width: "30%" },
     { id: "3", label: "Price Sale", width: "20%", sort: true },
-    { id: "4", label: "Actions", width: "20%" },
+    { id: "actions", label: "Actions", width: "20%" },
   ];
 
   const filterColumns = [
