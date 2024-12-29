@@ -107,17 +107,36 @@ export async function editProduct(product, images) {
     categories,
     old_images, // Send by public_id
   } = product;
+
   if (!id) {
     throw new Error("Missing product id");
   }
+
   const existGame = await prisma.product.findUnique({
     where: { id: Number(id) },
     select: {
       product_image: { select: { public_id: true } },
     },
   });
+
   if (!existGame) {
     throw new Error("Game is not available");
+  }
+
+  if (name) {
+    const existName = await prisma.product.findUnique({
+      where: {
+        name: name,
+        NOT: { id: id },
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (existName) {
+      throw new Error("Name exists");
+    }
   }
 
   const publisher = await prisma.publisher.upsert({
@@ -237,7 +256,7 @@ export async function editProduct(product, images) {
 }
 
 // Remove product
-export async function removeProduct(product_id) {
+export async function removeProduct(productID) {
   const existGame = await prisma.product.findUnique({
     select: {
       id: true,
@@ -245,7 +264,7 @@ export async function removeProduct(product_id) {
         select: { public_id: true },
       },
     },
-    where: { id: product_id },
+    where: { id: productID },
   });
   if (!existGame) {
     throw new Error("Game is not available");
@@ -266,7 +285,7 @@ export async function removeProduct(product_id) {
 
   // Cascading delete product
   await prisma.product.delete({
-    where: { id: product_id },
+    where: { id: productID },
   });
 
   return { message: "Game removed successfully" };

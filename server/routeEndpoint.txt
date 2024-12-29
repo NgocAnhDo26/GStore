@@ -1,19 +1,26 @@
 1. Product listing, search, filter
-- if no query, fetch all games; else fetch with Url query, filter, and search: get http://localhost:2000/api/product/
-- Feature product: get http://localhost:2000/api/product/feature-product/
-- Bestseller, hot games: get http://localhost:2000/api/product/bestseller/
-- categories and number of games in each category: get http://localhost:2000/api/product/category/
-- List products (fetch by list of id): get http://localhost:2000/api/product/list-productID/
-- Single product (fetch by product_id): get http://localhost:2000/api/product/:product_id/
+- if no query, fetch all games; else fetch with Url query, filter, and search: get http://localhost:1111/api/product/
+- Feature product: get http://localhost:1111/api/product/feature-product/
+- Bestseller, hot games: get http://localhost:1111/api/product/bestseller/
+- categories and number of games in each category: get http://localhost:1111/api/product/category/
+- List products (fetch by list of id): get http://localhost:1111/api/product/list-productID/
+- Single product (fetch by productID): get http://localhost:1111/api/product/:productID/
 2. Shopping cart
-- Fetch all games: get http://localhost:2000/api/cart/
-- Add new game: post http://localhost:2000/api/cart/
-- Remove game: delete http://localhost:2000/api/cart/:product_id
-- update game quantity: put http://localhost:2000/api/cart/ (req.body = {product_id, quantity})
+- Fetch all games: get http://localhost:1111/api/cart/
+- Add new game: post http://localhost:1111/api/cart/
+- Remove game: delete http://localhost:1111/api/cart/:productID
+- update game quantity: put http://localhost:1111/api/cart/ (req.body = {productID, quantity})
 3. Admin
-- Fetch all games: get http://localhost:2000/admin/product/
-- Add new game: post http://localhost:2000/admin/product/ (req.body = {name, description, price, price_sale, in_stock, publisher_name, categories, images})
-- Update game: put http://localhost:2000/admin/product/ (req.body = {name, description, price, price_sale, in_stock, publisher_name, categories, images, old_images})
-- Fetch all game sales: get http://localhost:2000/admin/product/sale/ (req.body = {duration, dateStr})
-- Remove game: delete http://localhost:2000/admin/product/:product_id
-- Fetch single game: get http://localhost:2000/admin/product/:product_id
+3.1. Products
+- Fetch all games: get http://localhost:1111/admin/product/
+- Add new game: post http://localhost:1111/admin/product/ (req.body = {name, description, price, price_sale, in_stock, publisher_name, categories, images})
+- Update game: put http://localhost:1111/admin/product/ (req.body = {name, description, price, price_sale, in_stock, publisher_name, categories, images, old_images})
+- Fetch all game sales: get http://localhost:1111/admin/product/sale/ (req.body = {duration, dateStr})
+- Remove game: delete http://localhost:1111/admin/product/:productID
+- Fetch single game: get http://localhost:1111/admin/product/:productID
+3.2. User
+- Fetch all accounts: get http://localhost:1111/admin/user/
+- Add new account: post http://localhost:1111/admin/user/ (req.body = {email, username, password}) // compulsory;  other fields: not compulsory
+- Update account: put http://localhost:1111/admin/user/
+- Remove account: delete http://localhost:1111/admin/user/:accountID
+- Fetch single account: get http://localhost:1111/admin/user/:accountID

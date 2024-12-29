@@ -100,18 +100,18 @@ model orders {
 model product {
   id               Int                @id @default(autoincrement())
   name             String             @unique(map: "name") @db.VarChar(70)
-  description      String             @db.Text
-  price            Int                @default(1099000)
-  price_sale       Int                @default(1099000)
-  in_stock         Int                @default(100)
-  sales            Int                @default(0)
-  create_time      DateTime           @default(now()) @db.Timestamp(0)
-  publisher_id     Int
+  description      String?            @db.Text
+  price            Int?               @default(1099000)
+  price_sale       Int?               @default(1099000)
+  in_stock         Int?               @default(100)
+  sales            Int?               @default(0)
+  create_time      DateTime?          @default(now()) @db.Timestamp(0)
+  publisher_id     Int?
   cart             cart[]
   category_product category_product[]
   key_game         key_game[]
   order_product    order_product[]
-  publisher        publisher          @relation(fields: [publisher_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_product_publisher")
+  publisher        publisher?         @relation(fields: [publisher_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_product_publisher")
   product_image    product_image[]
   product_review   product_review[]
   wishlist         wishlist[]
