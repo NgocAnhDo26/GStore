@@ -13,8 +13,8 @@ const Admin = () => {
         switch (activeSection) {
             case "dashboard":
                 return <Dashboard />;
-            // case "users":
-            //     return <Users />;
+            case "users":
+                return <Users />;
             case "products":
                 return <Products />;
             case "keygames":
