@@ -1,4 +1,5 @@
 import { prisma } from '../../config/config.js';
+import { getImage } from "../util/util.js";
 import jwt from 'jsonwebtoken';
 
 async function fetchAccountByID(accountID) {
@@ -417,7 +418,7 @@ async function fetchWishlistWithQuery(account_id, query) {
       product_name: item.product.name,
       product_price: item.product.price,
       product_price_sale: item.product.price_sale || null,
-      product_profile_image: imageMap[item.product.id] || null, // Add profile image or null
+      product_profile_image: getImage(imageMap[item.product.id] || null), // Add profile image or null
       create_time: item.created_time,
     }));
 
