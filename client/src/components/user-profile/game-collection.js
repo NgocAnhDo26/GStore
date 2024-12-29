@@ -43,7 +43,7 @@ const GameCollection = () => {
         1: new Date(game.create_time).toLocaleDateString(),
         2: game.id,
         3: game.name,
-        actions: [{ label: "View", link: "#" }],
+        actions: [{ label: "View", link: `products/${game.id}` }],
       }));
       setTableRow(rows); 
     }
