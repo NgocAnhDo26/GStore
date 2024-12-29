@@ -2,12 +2,15 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import { useCart } from "../hooks/CartProvider";
 
 const Checkout = () => {
     const [cartItems, setCartItems] = useState([]);
     const [totalAmount, setTotalAmount] = useState(0);
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(1);
     const navigate = useNavigate();
+
+    const { clearCart } = useCart();
 
     useEffect(() => {
         axios
@@ -42,7 +45,7 @@ const Checkout = () => {
                     text: res.data.message || "Checkout completed successfully!",
                 });
                 setCartItems([]);
-    
+                clearCart();
                 setTimeout(() => {
                     navigate("/");
                 }, 3000);

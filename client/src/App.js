@@ -3,6 +3,7 @@ import React from "react";
 import GuestGuard from "./hooks/GuestGuard";
 import AuthProvider from "./hooks/AuthProvider";
 import CartProvider from "./hooks/CartProvider";
+import AdminGuard from "./hooks/AdminGuard";
 
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
@@ -24,7 +25,6 @@ function App() {
       <AuthProvider>
         <CartProvider>
           <Routes>
-            <Route path="/admin" element={<Admin />} />
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />
               <Route path="/home" element={<Home />} />
@@ -44,6 +44,9 @@ function App() {
                 <Route path="/checkout" element={<Checkout />} />
               </Route>
               <Route path="*" element={<div class="flex-1"></div>} />
+            </Route>
+
+            <Route path="/admin" element={<AdminGuard> <Admin /> </AdminGuard>}>
             </Route>
           </Routes>
         </CartProvider>

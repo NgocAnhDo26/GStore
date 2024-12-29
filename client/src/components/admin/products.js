@@ -35,7 +35,7 @@ const Products = () => {
             3: game.profile_img.url,
             4: game.categories.join(", "),
             actions: [
-              { label: "View", link: `/product/${game.id}` },
+              { label: "View", link: `/products/${game.id}` },
               {
                 type: "button",
                 label: "View Details",

@@ -260,7 +260,7 @@ const CartProvider = ({ children }) => {
         // Clear guest cart
         setCart([]);
         setProducts([]);
-        localStorage.removeItem("cart");
+        localStorage.setItem("cart", JSON.stringify([]));
     }
 
     return (
