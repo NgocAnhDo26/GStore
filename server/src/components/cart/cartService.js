@@ -34,10 +34,11 @@ export async function fetchAllGames(accountID) {
   });
 
   if (!games.length) {
-    throw new Error(`Cart is empty`);
+    return [];
   }
 
   const formatResult = games.map((game) => ({
+    id: game.product.id,
     name: game.product.name,
     publisher_name: game.product.publisher.name,
     profile_img: getImage(game.product.product_image[0]?.public_id),
@@ -46,6 +47,7 @@ export async function fetchAllGames(accountID) {
     total_save: game.product.price - game.product.price_sale,
     quantity: game.quantity,
   }));
+
   return formatResult;
 }
 
@@ -109,6 +111,7 @@ export async function addNewGame(accountID, productList) {
       });
 
       const formatResult = {
+        id: newGame.product.id,
         name: newGame.product.name,
         publisher_name: newGame.product.publisher.name,
         profile_img: getImage(newGame.product.product_image[0]?.public_id),

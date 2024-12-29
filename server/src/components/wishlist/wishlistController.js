@@ -22,7 +22,7 @@ userRouter.post("/add-to-wishlist", async (req, res) => {
     }
 
 });
-userRouter.delete("/remove-from-wishlist", async (req, res) => {
+userRouter.post("/remove-from-wishlist", async (req, res) => {
     const { productId } = req.body;
     const token = req.cookies.authToken;
     if (!productId) {

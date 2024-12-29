@@ -248,6 +248,9 @@ export async function fetchProductByID(productID) {
 
 export async function fetchProductByListID(listID) {
   const { listProductID } = listID;
+  if (listProductID.length === 0) {
+    return [];
+  }
   const products = await prisma.product.findMany({
     select: {
       id: true,

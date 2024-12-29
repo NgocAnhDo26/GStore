@@ -48,7 +48,7 @@ router.get("/category", (req, res) => {
     });
 });
 
-router.get("/list-productID", (req, res) => {
+router.post("/list-productID", (req, res) => {
   // Find products by list of product id
   service
     .fetchProductByListID(req.body)
