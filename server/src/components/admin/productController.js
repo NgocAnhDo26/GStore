@@ -1,5 +1,5 @@
 import express from "express";
-import * as service from "./adminService.js";
+import * as service from "./productService.js";
 import {
   fetchProductWithQuery,
   fetchProductByID,
