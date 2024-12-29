@@ -33,15 +33,15 @@ const ShoppingCart = () => {
                                 <th>Subtotal</th>
                                 <th></th>
                             </tr>
-                            {!user ? products.map((product) => {
+                            {!user ? (products !== undefined && products !== null && products.length > 0 && products.map((product) => {
                                 const cartItem = cart.find((item) => item.id === product.id);
                                 return (
-                                    <tr key={product.id}>
+                                    <tr key={product.id} className="my-2">
                                         <td className="text-center w-min">
                                             <img src={product.profile_img.url} alt={product.name} className="rounded-md object-cover h-24 w-fit" />
                                         </td>
                                         <td>
-                                            <h3 className="font-semibold">{product.name}</h3>
+                                            <Link to={`/products/${product.id}`} className="font-semibold">{product.name}</Link>
                                             <p className="text-sm">{product.publisher}</p>
                                         </td>
                                         <td className="text-center">
@@ -54,24 +54,24 @@ const ShoppingCart = () => {
                                             <button onClick={() => removeFromCart(product.id)} className="bg-red-500 p-2 rounded-md text-white hover:scale-105 transition duration-200">Remove</button>
                                         </td>
                                     </tr>);
-                            }) : cart.length > 0 && cart.map((item) => (
-                                <tr key={item.id}>
+                            })) : cart.length > 0 && cart.map((item) => (
+                                <tr key={item?.id} className="my-2">
                                     <td className="text-center w-min">
-                                        <img src={item.profile_img.url} alt={item.name} className="rounded-md object-cover h-24" />
+                                        <img src={item?.profile_img?.url} alt={item?.name} className="rounded-md object-cover h-24" />
                                     </td>
                                     <td>
-                                        <h3 className="font-semibold">{item.name}</h3>
-                                        <p className="text-sm">{item.publisher_name}</p>
+                                        <Link to={`/products/${item?.id}`} className="font-semibold">{item?.name}</Link>
+                                        <p className="text-sm">{item?.publisher_name}</p>
                                     </td>
                                     <td className="text-center">
-                                        <input type="number" min={1} max={5} className="text-black w-12 pl-2" value={item.quantity} onChange={(e) => changeQuantity(item.id, e.target.value)} />
+                                        <input type="number" min={1} max={5} className="text-black w-12 pl-2" value={item?.quantity} onChange={(e) => changeQuantity(item?.id, e.target.value)} />
                                     </td>
                                     <td className="text-center">
-                                        {item.price !== item.price_sale && <p className="text-sm line-through text-gray-300">{formatCurrency(item.price)}</p>}
-                                        <p>{formatCurrency(item.price_sale)}</p>
+                                        {item?.price !== item?.price_sale && <p className="text-sm line-through text-gray-300">{formatCurrency(item?.price)}</p>}
+                                        <p>{formatCurrency(item?.price_sale)}</p>
                                     </td>
                                     <td className="text-center">
-                                        <button onClick={() => removeFromCart(item.id)} className="bg-red-500 p-2 rounded-md text-white hover:scale-105 transition duration-200">Remove</button>
+                                        <button onClick={() => removeFromCart(item?.id)} className="bg-red-500 p-2 rounded-md text-white hover:scale-105 transition duration-200">Remove</button>
                                     </td>
                                 </tr>
                             ))}
@@ -88,13 +88,13 @@ const ShoppingCart = () => {
                         <p className="font-semibold">Subtotal: </p>
                         <p className="place-self-end self-start ml-auto">{formatCurrency(totalPrice)}</p>
                     </div>
-                    <hr className="col-span-2 flex-wrap" />
+                    <hr className="col-span-2 flex-wrap mt-auto" />
                     <div className="flex flex-wrap">
                         <p className="font-semibold text-xl self-center">TOTAL: </p>
                         <p className="place-self-end self-center text-xl ml-auto">{formatCurrency(totalPrice)}</p>
                     </div>
 
-                    <Link to="/checkout" className="bg-gradient-to-t from-btn-red2/70 to-btn-red1/70 p-2 rounded-md text-white hover:scale-105 transition duration-200 mt-auto text-center">
+                    <Link to="/checkout" className="bg-gradient-to-t from-btn-red2/70 to-btn-red1/70 p-2 rounded-md text-white hover:scale-105 transition duration-200 text-center">
                         Checkout
                     </Link>
 

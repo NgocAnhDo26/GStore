@@ -1,8 +1,10 @@
 import React, { useState } from "react";
-import { useAuth } from "../../hooks/AuthProvider";
 import Swal from "sweetalert2";
-import { Link } from "react-router-dom";
 import axios from "axios";
+
+import { useAuth } from "../../hooks/AuthProvider";
+import { useCart } from "../../hooks/CartProvider";
+import { Link } from "react-router-dom";
 
 import { FaHeart, FaRegHeart } from "react-icons/fa6";
 import { FiShoppingCart } from "react-icons/fi";
@@ -12,6 +14,7 @@ const ProductItem = (props) => {
     const { data } = props;
     const [isWishlisted, setIsWishlisted] = useState(props.isWishlisted);
     const { user } = useAuth();
+    const { addToCart } = useCart();
 
     const handleAddToWishlist = (productId) => {
         if (!user) {
@@ -93,7 +96,9 @@ const ProductItem = (props) => {
                     className="bg-gradient-to-t from-btn-red2/70 to-btn-red1/70 p-2 rounded-md text-center hover:scale-110 transition duration-200">
                     {isWishlisted ? <FaHeart size={22} color="white" /> : <FaRegHeart size={22} color="white" />}
                 </button>
-                <button className="bg-white text-blue1 rounded-md p-2 flex items-center gap-3 shadow-md hover:scale-105 transition duration-200 font-medium">
+                <button
+                    onClick={() => addToCart(data.id)}
+                    className="bg-white text-blue1 rounded-md p-2 flex items-center gap-3 shadow-md hover:scale-105 transition duration-200 font-medium">
                     <FiShoppingCart />
                     Add to cart</button>
             </div>

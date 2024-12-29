@@ -27,7 +27,6 @@ const Admin = () => {
     };
 
     return (
-
         <>
             <AdminSidebar
                 activeSection={activeSection}

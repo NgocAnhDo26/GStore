@@ -185,5 +185,22 @@ authRouter.get("/check-exist-username", async (req, res) => {
     res.status(500).json({ message: 'An error occurred, please try again later.' });
   }
 });
+// check user is admin
+authRouter.get("/check-admin", async (req, res) => {
+  const token = req.cookies.authToken;
+  if (!token) {
+    return res.status(401).json({ success: false, message: 'You are Unauthorized!' });
+  }
+  try {
+    const decoded = await decodeJwt(token);
+    if (decoded.isAdmin === true) {
+      return res.status(200).json({success:true,message:'Authorized!'});
+    }
+    res.status(401).json({ success: false, message: 'You are Unauthorized!' });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ message: 'An error occurred, please try again later.' });
+  }
+});
 
 export default authRouter;
