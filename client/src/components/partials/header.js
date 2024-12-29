@@ -68,7 +68,7 @@ const Header = () => {
   const ProfileDropDown = () => {
     return (
       <div className="absolute flex flex-col bg-blue1 bg-opacity-90 backdrop-blur-sm py-3 rounded-md mt-36 ml-5 text-white">
-        <Link to="/profile" className="hover:bg-btn-blue2 px-5 py-2">
+        <Link to="/profile/account" className="hover:bg-btn-blue2 px-5 py-2">
           Your Profile
         </Link>
         <button className="hover:bg-btn-blue2 px-5 py-2 text-left" onClick={closeProfileDropdown && auth.handleLogout}>
