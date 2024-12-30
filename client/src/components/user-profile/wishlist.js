@@ -44,7 +44,7 @@ const MyWishlist = () => {
         1: item.product_profile_image.url,
         2: item.product_name,
         3: item.product_price_sale,
-        actions: [{ label: "View", link: `product/${item.product_id}` }],
+        actions: [{ label: "View", link: `/products/${item.product_id}` }],
       }));
       setTableRow(rows);
     } else {
